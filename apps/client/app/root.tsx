@@ -35,7 +35,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <div
-          className="bg-background bg-cover bg-center bg-fixed relative overflow-x-hidden"
+          className="bg-background bg-cover bg-center bg-fixed relative overflow-x-hidden font-mono"
           style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7)), url(${cinemaBg})`,
           }}
