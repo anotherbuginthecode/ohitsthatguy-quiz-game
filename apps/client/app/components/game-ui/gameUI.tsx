@@ -1,3 +1,55 @@
+// Checks if the answer is correct, repeated, or incorrect
+export function checkMovieAnswer({
+  answer,
+  answeredMovies,
+  pickedActor,
+}: {
+  answer: string;
+  answeredMovies: string[];
+  pickedActor: PickedActor;
+}): "correct" | "incorrect" | "repeated" {
+  if (answeredMovies.includes(answer.trim())) {
+    return "repeated";
+  }
+  if (
+    pickedActor &&
+    pickedActor.movies.some((movie) => fuzzyMatch(movie, answer))
+  ) {
+    return "correct";
+  }
+  return "incorrect";
+}
+// Utility: Normalize string (remove punctuation, lowercase, trim)
+function normalize(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/[^\w\s]|_/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Utility: Fuzzy match (Levenshtein distance <= 2)
+function fuzzyMatch(a: string, b: string): boolean {
+  const s1 = normalize(a);
+  const s2 = normalize(b);
+  if (s1 === s2) return true;
+  // Levenshtein distance
+  const dp = Array(s1.length + 1)
+    .fill(null)
+    .map(() => Array(s2.length + 1).fill(0));
+  for (let i = 0; i <= s1.length; i++) dp[i][0] = i;
+  for (let j = 0; j <= s2.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= s1.length; i++) {
+    for (let j = 1; j <= s2.length; j++) {
+      if (s1[i - 1] === s2[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1];
+      } else {
+        dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+      }
+    }
+  }
+  return dp[s1.length][s2.length] <= 2;
+}
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "~/components/ui/card";
 import RoundCounter from "./roundCounter";
@@ -29,7 +81,7 @@ export default function GameUI({
   const [score, setScore] = useState(0);
   const [points, setPoints] = useState(0);
   const [timeLeft, setTimeLeft] = useState(20);
-  const [isRunning, setIsRunning] = useState(false);
+  // Removed unused isRunning state
   const [answerStatus, setAnswerStatus] = useState<
     "correct" | "incorrect" | "repeated" | null
   >(null);
@@ -41,16 +93,16 @@ export default function GameUI({
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === "Return") {
-      if (answeredMovies.includes(answer.trim())) {
+      const result = checkMovieAnswer({
+        answer,
+        answeredMovies,
+        pickedActor,
+      });
+      if (result === "repeated") {
         setAnswerStatus("repeated");
         setAnswer("");
         return;
-      } else if (
-        pickedActor &&
-        pickedActor.movies.some(
-          (movie) => movie.toLowerCase() === answer.trim().toLowerCase()
-        )
-      ) {
+      } else if (result === "correct") {
         setAnswerStatus("correct");
         const calcultedPoints = Math.max(1, Math.floor(timeLeft / 2));
         setPoints(calcultedPoints);
@@ -74,15 +126,17 @@ export default function GameUI({
       }, 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 && gamePhase === "playing") {
-      setGamePhase("playing");
+      if (round >= totalRound) {
+        setGamePhase("gameEnd");
+        onGameEnd && onGameEnd();
+      } else {
+        setGamePhase("roundEnd");
+        onRoundEnd && onRoundEnd();
+        setRound((prev) => prev + 1);
+      }
       setTimeLeft(20);
       setAnswer("");
       setAnswerStatus(null);
-      if (round >= totalRound) {
-        setRound(1);
-      } else {
-        setRound((prev) => prev + 1);
-      }
     }
   }, [timeLeft, gamePhase]);
 
@@ -97,47 +151,86 @@ export default function GameUI({
 
       <Card className={`bg-gray-950 border-0 shadow-none`}>
         <CardContent className="space-y-4 flex flex-col items-center">
-          {answerStatus === "correct" && (
-            <Alert status="correct" message={`+${points} points!`} />
-          )}
-          {answerStatus === "incorrect" && (
-            <Alert status="incorrect" message={`Incorrect`} />
-          )}
-          {answerStatus === "repeated" && (
-            <Alert status="repeated" message={`Repeated`} />
-          )}
-          <div className="flex flex-col items-center text-center p-2">
-            <ActorImage
-              fullname={pickedActor?.name || ""}
-              imageUrl={pickedActor?.image || ""}
-            />
-          </div>
-          <div className="w-full">
-            <Input
-              className="text-gray-950 bg-white"
-              onKeyDown={handleInputKeyDown}
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-            />
-            <span className="text-sm text-white/50">
-              es. {pickedActor?.movies[0]}
-            </span>
-            {answeredMovies.length > 0 && (
+          {gamePhase === "playing" ? (
+            <>
+              {answerStatus === "correct" && (
+                <Alert status="correct" message={`+${points} points!`} />
+              )}
+              {answerStatus === "incorrect" && (
+                <Alert status="incorrect" message={`Incorrect`} />
+              )}
+              {answerStatus === "repeated" && (
+                <Alert status="repeated" message={`Repeated`} />
+              )}
+              <div className="flex flex-col items-center text-center p-2">
+                <ActorImage
+                  fullname={pickedActor?.name || ""}
+                  imageUrl={pickedActor?.image || ""}
+                />
+              </div>
+              <div className="w-full">
+                <Input
+                  className="text-gray-950 bg-white"
+                  onKeyDown={handleInputKeyDown}
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                />
+                <span className="text-sm text-white/50">
+                  es. {pickedActor?.movies[0]}
+                </span>
+              </div>
+              {answeredMovies.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-sm text-white/50 mb-1">Answered:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {answeredMovies.map((movie, index) => (
+                      <span
+                        key={index}
+                        className="bg-amber-500 text-white px-2 py-1 rounded-full text-xs"
+                      >
+                        {movie}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex flex-col gap-5 p-2">
+              <div className="text-2xl text-white">
+                Your score:{" "}
+                <span className="text-3xl text-amber-500 font-bold">
+                  {score}
+                </span>
+              </div>
               <div className="mt-2">
-                <p className="text-sm text-white/50 mb-1">Answered:</p>
+                <p className="text-sm text-white/50 mb-1">Your answers:</p>
+                {answeredMovies.map((movie, index) => (
+                  <span
+                    key={index}
+                    className="bg-amber-500 text-white px-2 py-1 rounded-full text-xs mr-2"
+                  >
+                    {movie}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-2">
+                <p className="text-sm text-white/50 mb-1">
+                  Some films starring the actor:
+                </p>
                 <div className="flex flex-wrap gap-2">
-                  {answeredMovies.map((movie, index) => (
+                  {pickedActor?.movies.map((movie, index) => (
                     <span
                       key={index}
-                      className="bg-amber-500 text-white px-2 py-1 rounded-full text-xs"
+                      className="bg-gray-800 text-white px-2 py-1 rounded-full text-xs"
                     >
                       {movie}
                     </span>
                   ))}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
