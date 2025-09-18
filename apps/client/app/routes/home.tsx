@@ -17,13 +17,12 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-10">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-10 p-10">
       <div>
         <h1 className="text-3xl font-bold">Oh it's that guy!</h1>
         <p className="mt-10">
-          Think you recognize that face? Test your memory! Try to remember as
-          many films as possible that each actor has appeared in before the
-          clock runs out. Ready to play?
+          Think you can match the face to the movies? Test your memory and see
+          how many films you can remember before time's up!
         </p>
       </div>
       <div className="w-full flex justify-center">
