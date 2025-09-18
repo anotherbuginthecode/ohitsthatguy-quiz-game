@@ -8,6 +8,7 @@ import {
 } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import GameUI from "../components/game-ui/gameUI";
 
 const LANGUAGES = [
   { code: "it", label: "Italiano", flag: "🇮🇹" },
@@ -16,8 +17,23 @@ const LANGUAGES = [
 
 export default function GamePlay() {
   const [language, setLanguage] = useState<string | null>(null);
-  const [rounds, setRounds] = useState(5);
+  const [rounds, setRounds] = useState(3);
   const [step, setStep] = useState(1);
+  const actor = {
+    id: 1,
+    name: "Leonardo DiCaprio",
+    image: "https://image.tmdb.org/t/p/w500/wo2hJpn04vbtmh0B9utCFdsQhxM.jpg",
+    movies: [
+      "Inception",
+      "Titanic",
+      "The Wolf of Wall Street",
+      "The Revenant",
+      "Django Unchained",
+      "Once Upon a Time in Hollywood",
+      "Shutter Island",
+      "Catch Me If You Can",
+    ],
+  };
 
   function handleStart() {
     // TODO: Start the game logic, e.g., navigate to the next step or game screen
@@ -27,7 +43,7 @@ export default function GamePlay() {
   return (
     <div className="container flex min-h-screen flex-col items-center justify-center p-10 gap-10">
       {step === 1 && (
-        <Card className="max-w-md w-full">
+        <Card className="max-w-md w-full bg-gray-950 border-0 text-white">
           <CardHeader>
             <CardTitle className="text-2xl">Start a New Game</CardTitle>
           </CardHeader>
@@ -38,9 +54,10 @@ export default function GamePlay() {
                 {LANGUAGES.map((lang) => (
                   <Button
                     key={lang.code}
-                    variant={language === lang.code ? "default" : "outline"}
                     onClick={() => setLanguage(lang.code)}
-                    className="flex-1 py-4 text-lg"
+                    className={`flex-1 py-4 text-lg text-gray-950 bg-white hover:bg-amber-500 hover:text-white cursor-pointer ${
+                      language === lang.code ? "bg-amber-500 text-white" : ""
+                    }`}
                     aria-pressed={language === lang.code}
                   >
                     <span className="mr-2 text-2xl">{lang.flag}</span>
@@ -57,13 +74,13 @@ export default function GamePlay() {
                 max={20}
                 value={rounds}
                 onChange={(e) => setRounds(Number(e.target.value))}
-                className="w-24"
+                className="w-24 bg-white text-gray-950"
               />
             </div>
           </CardContent>
           <CardFooter>
             <Button
-              className="w-full"
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white"
               onClick={handleStart}
               disabled={!language || rounds < 1}
             >
@@ -72,7 +89,7 @@ export default function GamePlay() {
           </CardFooter>
         </Card>
       )}
-      {step === 2 && <div>lets play!</div>}
+      {step === 2 && <GameUI totalRound={rounds} pickedActor={actor} />}
     </div>
   );
 }
