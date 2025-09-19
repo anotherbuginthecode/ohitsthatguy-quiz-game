@@ -28,7 +28,7 @@ jobs:
         run: pnpm install
 
       - name: Build client with TurboRepo
-        run: pnpm turbo build --filter=client
+        run: pnpm turbo build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
