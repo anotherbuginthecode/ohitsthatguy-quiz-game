@@ -9,3 +9,17 @@ dist-ssr
 .cache
 server/dist
 public/dist
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.crash
+.terraform/
+terraform.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+.terraform.lock.hcl
+.profile
