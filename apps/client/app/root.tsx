@@ -8,6 +8,7 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import Header from "~/components/Header";
 import "./app.css";
 import cinemaBg from "./assets/cinema-bg.jpg";
 
@@ -35,11 +36,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <div
-          className="bg-background bg-cover bg-center bg-fixed relative overflow-x-hidden font-mono"
+          className="bg-background bg-cover bg-center bg-fixed relative overflow-scroll font-baloo h-screen"
           style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7)), url(${cinemaBg})`,
           }}
         >
+          <Header />
           {children}
         </div>
         <ScrollRestoration />
