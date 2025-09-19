@@ -3,6 +3,7 @@ import type { Route } from "./+types/home";
 import { Button } from "~/components/ui/button";
 import { Link } from "react-router";
 import { v4 as uuidv4 } from "uuid";
+import Header from "~/components/Header";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -17,10 +18,9 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-10 p-10">
+    <div className="flex min-h-screen items-center flex-col gap-10 px-10 py-5">
       <div>
-        <h1 className="text-3xl font-bold">Oh it's that guy!</h1>
-        <p className="mt-10">
+        <p className="font-baloo-bold">
           Think you can match the face to the movies? Test your memory and see
           how many films you can remember before time's up!
         </p>

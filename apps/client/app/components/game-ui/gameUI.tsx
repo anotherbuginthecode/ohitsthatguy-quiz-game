@@ -50,6 +50,7 @@ function fuzzyMatch(a: string, b: string): boolean {
   }
   return dp[s1.length][s2.length] <= 2;
 }
+
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "~/components/ui/card";
 import RoundCounter from "./roundCounter";
@@ -58,6 +59,10 @@ import ActorImage from "./actorImage";
 import { Input } from "~/components/ui/input";
 import Timer from "./timer";
 import Alert from "./alert";
+import { Button } from "../ui/button";
+import { FaArrowRightLong } from "react-icons/fa6";
+import { MdOutlineLoop } from "react-icons/md";
+import { IoMdSettings } from "react-icons/io";
 
 export type GamePhase = "playing" | "roundEnd" | "gameEnd";
 export type PickedActor = {
@@ -69,13 +74,19 @@ export type PickedActor = {
 export default function GameUI({
   pickedActor,
   totalRound,
+  showHint = false,
+  isDemo = false,
   onRoundEnd,
   onGameEnd,
+  onNextRound,
 }: {
   pickedActor: PickedActor;
   totalRound: number;
+  showHint: boolean;
+  isDemo?: boolean;
   onRoundEnd?: () => void;
   onGameEnd?: () => void;
+  onNextRound?: () => void;
 }) {
   const [answer, setAnswer] = useState("");
   const [score, setScore] = useState(0);
@@ -118,6 +129,15 @@ export default function GameUI({
     }
   };
 
+  const handleNextRound = () => {
+    setRound((prev) => prev + 1);
+    setGamePhase("playing");
+    setAnsweredMovies([]);
+    setAnswerStatus(null);
+    setTimeLeft(20);
+    onNextRound && onNextRound();
+  };
+
   // Timer countdown
   useEffect(() => {
     if (gamePhase === "playing" && timeLeft > 0) {
@@ -127,12 +147,15 @@ export default function GameUI({
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 && gamePhase === "playing") {
       if (round >= totalRound) {
-        setGamePhase("gameEnd");
-        onGameEnd && onGameEnd();
+        if (!isDemo) {
+          setGamePhase("gameEnd");
+          onGameEnd && onGameEnd();
+        } else {
+          setGamePhase("roundEnd");
+        }
       } else {
         setGamePhase("roundEnd");
         onRoundEnd && onRoundEnd();
-        setRound((prev) => prev + 1);
       }
       setTimeLeft(20);
       setAnswer("");
@@ -142,13 +165,16 @@ export default function GameUI({
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <RoundCounter currentRound={round} totalRound={totalRound} />
-        <Score score={score} />
-      </div>
+      {gamePhase !== "gameEnd" && (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <RoundCounter currentRound={round} totalRound={totalRound} />
+            <Score score={score} />
+          </div>
 
-      <Timer timeLeft={timeLeft} />
-
+          <Timer timeLeft={timeLeft} />
+        </>
+      )}
       <Card className={`bg-gray-950 border-0 shadow-none`}>
         <CardContent className="space-y-4 flex flex-col items-center">
           {gamePhase === "playing" ? (
@@ -175,12 +201,14 @@ export default function GameUI({
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
                 />
-                <span className="text-sm text-white/50">
-                  es. {pickedActor?.movies[0]}
-                </span>
+                {showHint && (
+                  <span className="text-sm text-white/50">
+                    es. {pickedActor?.movies[0]}
+                  </span>
+                )}
               </div>
               {answeredMovies.length > 0 && (
-                <div className="mt-2">
+                <div className="mt-2 text-left w-full">
                   <p className="text-sm text-white/50 mb-1">Answered:</p>
                   <div className="flex flex-wrap gap-2">
                     {answeredMovies.map((movie, index) => (
@@ -195,7 +223,7 @@ export default function GameUI({
                 </div>
               )}
             </>
-          ) : (
+          ) : gamePhase === "roundEnd" ? (
             <div className="flex flex-col gap-5 p-2">
               <div className="text-2xl text-white">
                 Your score:{" "}
@@ -228,6 +256,37 @@ export default function GameUI({
                     </span>
                   ))}
                 </div>
+              </div>
+              {!isDemo && (
+                <div className="flex items-center justify-end">
+                  <Button
+                    className="flex items-center gap-2"
+                    onClick={handleNextRound}
+                  >
+                    Next round
+                    <FaArrowRightLong />
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-5 p-5">
+              <div className="text-4xl text-white font-bold">Game End!</div>
+              <div className="text-2xl text-white flex items-center gap-2">
+                Your score:
+                <span className="text-3xl text-amber-500 font-bold">
+                  {score}
+                </span>
+              </div>
+              <div className="mt-2 flex gap-4">
+                <Button>
+                  <MdOutlineLoop />
+                  Play Again!
+                </Button>
+                <Button>
+                  <IoMdSettings />
+                  Change Settings
+                </Button>
               </div>
             </div>
           )}

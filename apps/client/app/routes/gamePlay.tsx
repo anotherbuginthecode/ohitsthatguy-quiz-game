@@ -9,39 +9,45 @@ import {
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import GameUI from "../components/game-ui/gameUI";
+import { mockActorsENG, mockActorsITA } from "~/lib/mock";
 
 const LANGUAGES = [
   { code: "it", label: "Italiano", flag: "🇮🇹" },
   { code: "en", label: "English", flag: "🇬🇧" },
 ];
 
+type Actor = {
+  id: number;
+  name: string;
+  image: string;
+  movies: string[];
+};
+
 export default function GamePlay() {
   const [language, setLanguage] = useState<string | null>(null);
   const [rounds, setRounds] = useState(3);
   const [step, setStep] = useState(1);
-  const actor = {
-    id: 1,
-    name: "Leonardo DiCaprio",
-    image: "https://image.tmdb.org/t/p/w500/wo2hJpn04vbtmh0B9utCFdsQhxM.jpg",
-    movies: [
-      "Inception",
-      "Titanic",
-      "The Wolf of Wall Street",
-      "The Revenant",
-      "Django Unchained",
-      "Once Upon a Time in Hollywood",
-      "Shutter Island",
-      "Catch Me If You Can",
-    ],
-  };
+  const [actor, setActor] = useState<Actor | null>(null);
+
+  function pickRandomActor() {
+    // Mock data per il MVP - sostituire con API TMDB
+    const mockActors = language === "it" ? mockActorsITA : mockActorsENG;
+    const randomIndex = Math.floor(Math.random() * mockActors.length);
+    setActor(mockActors[randomIndex]);
+  }
 
   function handleStart() {
     // TODO: Start the game logic, e.g., navigate to the next step or game screen
+    pickRandomActor();
     setStep(2);
   }
 
+  function handleNextRound() {
+    pickRandomActor();
+  }
+
   return (
-    <div className="container flex min-h-screen flex-col items-center justify-center p-10 gap-10">
+    <div className="container flex min-h-screen flex-col items-center p-10 gap-10">
       {step === 1 && (
         <Card className="max-w-md w-full bg-gray-950 border-0 text-white">
           <CardHeader>
@@ -89,7 +95,16 @@ export default function GamePlay() {
           </CardFooter>
         </Card>
       )}
-      {step === 2 && <GameUI totalRound={rounds} pickedActor={actor} />}
+      {step === 2 && (
+        <div className="w-full max-w-2xl">
+          <GameUI
+            totalRound={rounds}
+            pickedActor={actor}
+            showHint={false}
+            onNextRound={handleNextRound}
+          />
+        </div>
+      )}
     </div>
   );
 }
