@@ -47,20 +47,13 @@ resource "aws_s3_bucket_website_configuration" "static_site" {
 	}
 }
 
-resource "aws_s3_bucket_policy" "static_site_policy" {
-	provider = aws.eu
-	bucket   = aws_s3_bucket.static_site.id
-	policy = jsonencode({
-		Version = "2012-10-17"
-		Statement = [
-			{
-				Effect = "Allow"
-				Principal = "*"
-				Action = ["s3:GetObject"]
-				Resource = ["${aws_s3_bucket.static_site.arn}/*"]
-			}
-		]
-	})
+
+resource "aws_cloudfront_origin_access_control" "oac" {
+	name                              = "ohitsthatguy-oac"
+	description                       = "OAC for S3 static site"
+	origin_access_control_origin_type  = "s3"
+	signing_behavior                   = "always"
+	signing_protocol                   = "sigv4"
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
@@ -69,16 +62,11 @@ resource "aws_cloudfront_distribution" "cdn" {
 	comment             = "CDN for ohitsthatguy.xyz static site"
 	default_root_object = "index.html"
 
-		origin {
-			domain_name = "${aws_s3_bucket.static_site.bucket}.s3-website-eu-west-1.amazonaws.com"
-			origin_id   = "s3-ohitsthatguy.xyz"
-			custom_origin_config {
-				http_port              = 80
-				https_port             = 443
-				origin_protocol_policy = "http-only"
-				origin_ssl_protocols   = ["TLSv1.2"]
-			}
-		}
+				origin {
+					domain_name              = aws_s3_bucket.static_site.bucket_regional_domain_name
+					origin_id                = "s3-ohitsthatguy.xyz"
+					origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
+				}
 
 	default_cache_behavior {
 		allowed_methods  = ["GET", "HEAD"]
