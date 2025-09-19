@@ -34,7 +34,7 @@ export default function HowItWorks() {
           <div className="flex justify-between items-center w-full mt-4">
             <div className="flex justify-center flex-col items-center">
               <MdOutlineTimer size={32} className="text-amber-500" />
-              <div className="text-center text-xs mt-2">20 seconds</div>
+              <div className="text-center text-xs mt-2">30 seconds</div>
             </div>
             <div className="flex justify-center flex-col items-center mx-4">
               <FaTrophy size={32} className="text-amber-500" />

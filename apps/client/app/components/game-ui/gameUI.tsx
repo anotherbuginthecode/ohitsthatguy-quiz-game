@@ -62,7 +62,7 @@ import Alert from "./alert";
 import { Button } from "../ui/button";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { MdOutlineLoop } from "react-icons/md";
-import { IoMdSettings } from "react-icons/io";
+import { Link } from "react-router";
 
 export type GamePhase = "playing" | "roundEnd" | "gameEnd";
 export type PickedActor = {
@@ -76,6 +76,7 @@ export default function GameUI({
   totalRound,
   showHint = false,
   isDemo = false,
+  gameUUID,
   onRoundEnd,
   onGameEnd,
   onNextRound,
@@ -84,6 +85,7 @@ export default function GameUI({
   totalRound: number;
   showHint: boolean;
   isDemo?: boolean;
+  gameUUID?: string;
   onRoundEnd?: () => void;
   onGameEnd?: () => void;
   onNextRound?: () => void;
@@ -91,7 +93,7 @@ export default function GameUI({
   const [answer, setAnswer] = useState("");
   const [score, setScore] = useState(0);
   const [points, setPoints] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(20);
+  const [timeLeft, setTimeLeft] = useState(30);
   // Removed unused isRunning state
   const [answerStatus, setAnswerStatus] = useState<
     "correct" | "incorrect" | "repeated" | null
@@ -278,14 +280,12 @@ export default function GameUI({
                   {score}
                 </span>
               </div>
-              <div className="mt-2 flex gap-4">
+              <div className="mt-2 flex items-center justify-center">
                 <Button>
-                  <MdOutlineLoop />
-                  Play Again!
-                </Button>
-                <Button>
-                  <IoMdSettings />
-                  Change Settings
+                  <Link to={`/play/${gameUUID}`}>
+                    <MdOutlineLoop />
+                    Play Again!
+                  </Link>
                 </Button>
               </div>
             </div>

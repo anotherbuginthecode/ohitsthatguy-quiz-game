@@ -10,6 +10,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import GameUI from "../components/game-ui/gameUI";
 import { mockActorsENG, mockActorsITA } from "~/lib/mock";
+import { useParams } from "react-router";
 
 const LANGUAGES = [
   { code: "it", label: "Italiano", flag: "🇮🇹" },
@@ -24,6 +25,7 @@ type Actor = {
 };
 
 export default function GamePlay() {
+  const { gameId } = useParams();
   const [language, setLanguage] = useState<string | null>(null);
   const [rounds, setRounds] = useState(3);
   const [step, setStep] = useState(1);
@@ -98,6 +100,7 @@ export default function GamePlay() {
       {step === 2 && (
         <div className="w-full max-w-2xl">
           <GameUI
+            gameUUID={gameId}
             totalRound={rounds}
             pickedActor={actor}
             showHint={false}
