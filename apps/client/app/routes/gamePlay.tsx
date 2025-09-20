@@ -13,11 +13,12 @@ import { mockActorsENG, mockActorsITA } from "~/lib/mock";
 import { trackNewGame } from "~/lib/ga-utils";
 import { useParams, useLocation } from "react-router";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
+import { use } from "react";
 
-const LANGUAGES = [
-  { code: "it", label: "Italiano", flag: "🇮🇹" },
-  { code: "en", label: "English", flag: "🇬🇧" },
-];
+// const LANGUAGES = [
+//   { code: "it", label: "Italiano", flag: "🇮🇹" },
+//   { code: "en", label: "English", flag: "🇬🇧" },
+// ];
 
 type Actor = {
   id: number;
@@ -33,20 +34,18 @@ export default function GamePlay() {
   const { gameId } = useParams();
   const [language, setLanguage] = useState<string | null>(null);
   const [rounds, setRounds] = useState(3);
-  const [step, setStep] = useState(1);
   const [actor, setActor] = useState<Actor | null>(null);
 
   function pickRandomActor() {
     // Mock data per il MVP - sostituire con API TMDB
-    const mockActors = language === "it" ? mockActorsITA : mockActorsENG;
+    // const mockActors = language === "it" ? mockActorsITA : mockActorsENG;
+    const mockActors = mockActorsENG;
     const randomIndex = Math.floor(Math.random() * mockActors.length);
     setActor(mockActors[randomIndex]);
   }
 
   function handleStart() {
-    // TODO: Start the game logic, e.g., navigate to the next step or game screen
     pickRandomActor();
-    setStep(2);
     trackNewGame(tracker, "new_game", {
       action: "new_game_started",
       category: "engagement",
@@ -64,68 +63,21 @@ export default function GamePlay() {
     tracker.trackPageView({});
   }, [location, tracker]);
 
+  useEffect(() => {
+    handleStart();
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col items-center gap-10 px-5">
-      {step === 1 && (
-        <Card className="max-w-md w-full bg-gray-950 border-0 text-white">
-          <CardHeader>
-            <CardTitle className="text-2xl">Start a New Game</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-6">
-            <div>
-              <div className="mb-2 font-medium">Select language</div>
-              <div className="flex gap-4">
-                {LANGUAGES.map((lang) => (
-                  <Button
-                    key={lang.code}
-                    onClick={() => setLanguage(lang.code)}
-                    className={`flex-1 py-4 text-lg text-gray-950 bg-white hover:bg-yellow-300 hover:text-gray-950 cursor-pointer ${
-                      language === lang.code
-                        ? "bg-yellow-300 text-gray-950"
-                        : ""
-                    }`}
-                    aria-pressed={language === lang.code}
-                  >
-                    <span className="mr-2 text-2xl">{lang.flag}</span>
-                    {lang.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <div className="mb-2 font-medium">Number of rounds</div>
-              <Input
-                type="number"
-                min={1}
-                max={20}
-                value={rounds}
-                onChange={(e) => setRounds(Number(e.target.value))}
-                className="w-24 bg-white text-gray-950"
-              />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button
-              className="w-full bg-yellow-300 hover:bg-amber-600 text-gray-950 text-lg"
-              onClick={handleStart}
-              disabled={!language || rounds < 1}
-            >
-              Start
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
-      {step === 2 && (
-        <div className="w-full max-w-2xl">
-          <GameUI
-            gameUUID={gameId}
-            totalRound={rounds}
-            pickedActor={actor}
-            showHint={false}
-            onNextRound={handleNextRound}
-          />
-        </div>
-      )}
+      <div className="w-full max-w-2xl">
+        <GameUI
+          gameUUID={gameId}
+          totalRound={rounds}
+          pickedActor={actor}
+          showHint={false}
+          onNextRound={handleNextRound}
+        />
+      </div>
     </div>
   );
 }
