@@ -19,8 +19,8 @@ export default defineConfig({
         "favicon.ico",
         "apple-touch-icon.png",
         "assets/*",
-        "AppImages/icon-ios.png",
-        "AppImages/icon-android.png",
+        "AppImages/ios/180.png",
+        "AppImages/android/180.png",
       ],
       manifest: {
         short_name: "OTTG!",
