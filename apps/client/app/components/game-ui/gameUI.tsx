@@ -109,28 +109,38 @@ export default function GameUI({
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === "Return") {
-      const result = checkMovieAnswer({
-        answer,
-        answeredMovies,
-        pickedActor,
-      });
-      if (result === "repeated") {
-        setAnswerStatus("repeated");
-        setAnswer("");
-        return;
-      } else if (result === "correct") {
-        setAnswerStatus("correct");
-        const calcultedPoints = Math.max(1, Math.floor(timeLeft / 2));
-        setPoints(calcultedPoints);
-        setScore((prev) => prev + calcultedPoints);
-        setAnsweredMovies((prev) => [...prev, answer.trim()]);
-        setAnswer("");
-        return;
-      } else {
-        setAnswerStatus("incorrect");
-        setAnswer("");
-        return;
-      }
+      e.preventDefault();
+      checkAnswer();
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    checkAnswer();
+  };
+
+  const checkAnswer = () => {
+    const result = checkMovieAnswer({
+      answer,
+      answeredMovies,
+      pickedActor,
+    });
+    if (result === "repeated") {
+      setAnswerStatus("repeated");
+      setAnswer("");
+      return;
+    } else if (result === "correct") {
+      setAnswerStatus("correct");
+      const calcultedPoints = Math.max(1, Math.floor(timeLeft / 2));
+      setPoints(calcultedPoints);
+      setScore((prev) => prev + calcultedPoints);
+      setAnsweredMovies((prev) => [...prev, answer.trim()]);
+      setAnswer("");
+      return;
+    } else {
+      setAnswerStatus("incorrect");
+      setAnswer("");
+      return;
     }
   };
 
@@ -148,7 +158,7 @@ export default function GameUI({
     if (gamePhase === "playing" && timeLeft > 0) {
       if (!isDemo) {
         const timer = setTimeout(() => {
-          setTimeLeft(timeLeft - 1);
+          // setTimeLeft(timeLeft - 1);
         }, 1000);
         return () => clearTimeout(timer);
       }
@@ -173,11 +183,11 @@ export default function GameUI({
   return (
     <div className="fixed inset-5 flex items-center justify-center z-30">
       <div className="w-full">
-        <Card className="bg-gray-950 border-0 shadow-none w-full">
+        <Card className="bg-gray-950 border-0 shadow-none w-full xl:max-w-xl mx-auto">
           <CardContent className="flex flex-col items-center gap-4 py-6 px-2">
             {gamePhase !== "gameEnd" && (
               <>
-                <div className="flex justify-between items-center w-full mb-2 px-5">
+                <div className="flex justify-between items-center w-full mb-2 px-5 xl:px-10">
                   <RoundCounter currentRound={round} totalRound={totalRound} />
                   <Score score={score} />
                 </div>
@@ -230,7 +240,12 @@ export default function GameUI({
                     onChange={(e) => setAnswer(e.target.value)}
                   />
                   <div className="w-full flex justify-center">
-                    <Button className="text-xl bg-green-500">Submit</Button>
+                    <Button
+                      className="text-xl bg-green-500"
+                      onClick={(e) => handleSubmit(e)}
+                    >
+                      Submit
+                    </Button>
                   </div>
                   {showHint && (
                     <span className="text-sm text-white/50 block mt-1">
@@ -238,7 +253,7 @@ export default function GameUI({
                     </span>
                   )}
                 </div>
-                <div className="w-full absolute bottom-10">
+                <div className="w-full xl:max-w-xl absolute bottom-10">
                   <Timer timeLeft={timeLeft} />
                 </div>
               </div>
