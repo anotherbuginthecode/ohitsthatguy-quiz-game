@@ -20,6 +20,9 @@ importers:
 
   apps/client:
     dependencies:
+      '@keiko-app/react-google-analytics':
+        specifier: ^1.0.0
+        version: 1.0.0
       '@radix-ui/react-progress':
         specifier: ^1.1.7
         version: 1.1.7(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -679,6 +682,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@keiko-app/react-google-analytics@1.0.0':
+    resolution: {integrity: sha512-nhOMXtUKPYs7Ulp1vzgmoy2ExWsut6924hTOjsoUVG2FaLiIxVVpHoaOLErPszQugF7PHbQX3edUUmxI95U/lQ==}
 
   '@mjackson/node-fetch-server@0.2.0':
     resolution: {integrity: sha512-EMlH1e30yzmTpGLQjlFmaDAjyOeZhng1/XCd7DExR8PNAnG/G1tyruZxEoUe11ClnwGhGrtsdnyyUx1frSzjng==}
@@ -3028,6 +3034,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@keiko-app/react-google-analytics@1.0.0': {}
 
   '@mjackson/node-fetch-server@0.2.0': {}
 

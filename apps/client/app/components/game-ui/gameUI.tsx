@@ -62,7 +62,8 @@ import Alert from "./alert";
 import { Button } from "../ui/button";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { MdOutlineLoop } from "react-icons/md";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
+import { useAnalytics } from "@keiko-app/react-google-analytics";
 
 export type GamePhase = "playing" | "roundEnd" | "gameEnd";
 export type PickedActor = {
@@ -90,6 +91,8 @@ export default function GameUI({
   onGameEnd?: () => void;
   onNextRound?: () => void;
 }) {
+  const location = useLocation();
+  const { tracker } = useAnalytics();
   const [answer, setAnswer] = useState("");
   const [score, setScore] = useState(0);
   const [points, setPoints] = useState(0);
@@ -136,7 +139,7 @@ export default function GameUI({
     setGamePhase("playing");
     setAnsweredMovies([]);
     setAnswerStatus(null);
-    setTimeLeft(20);
+    setTimeLeft(30);
     onNextRound && onNextRound();
   };
 
@@ -281,7 +284,15 @@ export default function GameUI({
                 </span>
               </div>
               <div className="mt-2 flex items-center justify-center">
-                <Button>
+                <Button
+                  onClick={() => {
+                    tracker.trackEvent("play_again", {
+                      action: "play_again",
+                      category: "engagement",
+                      gameId: gameUUID,
+                    });
+                  }}
+                >
                   <Link to={`/play/${gameUUID}`}>
                     <MdOutlineLoop />
                     Play Again!

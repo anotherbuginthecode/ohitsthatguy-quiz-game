@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Create .env file
+        run: echo "VITE_APP_GA4_MEASUREMENT_ID=${{ secrets.VITE_APP_GA4_MEASUREMENT_ID }}" > apps/client/.env
+
       - name: Build client with TurboRepo
         run: pnpm turbo build
 

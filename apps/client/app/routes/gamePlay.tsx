@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -10,7 +10,9 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import GameUI from "../components/game-ui/gameUI";
 import { mockActorsENG, mockActorsITA } from "~/lib/mock";
-import { useParams } from "react-router";
+import { trackNewGame } from "~/lib/ga-utils";
+import { useParams, useLocation } from "react-router";
+import { useAnalytics } from "@keiko-app/react-google-analytics";
 
 const LANGUAGES = [
   { code: "it", label: "Italiano", flag: "🇮🇹" },
@@ -25,6 +27,9 @@ type Actor = {
 };
 
 export default function GamePlay() {
+  const location = useLocation();
+  const { tracker } = useAnalytics();
+
   const { gameId } = useParams();
   const [language, setLanguage] = useState<string | null>(null);
   const [rounds, setRounds] = useState(3);
@@ -42,11 +47,22 @@ export default function GamePlay() {
     // TODO: Start the game logic, e.g., navigate to the next step or game screen
     pickRandomActor();
     setStep(2);
+    trackNewGame(tracker, "new_game", {
+      action: "new_game_started",
+      category: "engagement",
+      language: language,
+      rounds: rounds,
+      gameId: gameId,
+    });
   }
 
   function handleNextRound() {
     pickRandomActor();
   }
+
+  useEffect(() => {
+    tracker.trackPageView({});
+  }, [location, tracker]);
 
   return (
     <div className="container flex min-h-screen flex-col items-center p-10 gap-10">

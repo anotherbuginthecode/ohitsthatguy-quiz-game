@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { AnalyticsProvider } from "@keiko-app/react-google-analytics";
 
 import type { Route } from "./+types/root";
 import Header from "~/components/Header";
@@ -25,6 +26,12 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+const analyticsConfig = {
+  measurementId: import.meta.env.VITE_APP_GA4_MEASUREMENT_ID,
+  debug: false,
+  verbose: false,
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -35,17 +42,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <div
-          className="bg-background bg-cover bg-center bg-fixed relative overflow-scroll font-baloo h-screen"
-          style={{
-            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7)), url(${cinemaBg})`,
-          }}
-        >
-          <Header />
-          {children}
-        </div>
-        <ScrollRestoration />
-        <Scripts />
+        <AnalyticsProvider config={analyticsConfig}>
+          <div
+            className="bg-background bg-cover bg-center bg-fixed relative overflow-scroll font-baloo h-screen"
+            style={{
+              backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7)), url(${cinemaBg})`,
+            }}
+          >
+            <Header />
+            {children}
+          </div>
+          <ScrollRestoration />
+          <Scripts />
+        </AnalyticsProvider>
       </body>
     </html>
   );

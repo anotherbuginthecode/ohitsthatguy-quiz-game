@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import HowItWorks from "~/components/HowItWorks";
 import type { Route } from "./+types/home";
 import { Button } from "~/components/ui/button";
 import { Link } from "react-router";
 import { v4 as uuidv4 } from "uuid";
-import Header from "~/components/Header";
+import { useAnalytics } from "@keiko-app/react-google-analytics";
+import { useLocation } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -17,6 +19,13 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const location = useLocation();
+  const { tracker } = useAnalytics();
+
+  useEffect(() => {
+    tracker.trackPageView({});
+  }, [location, tracker]);
+
   return (
     <div className="flex min-h-screen items-center flex-col gap-10 px-10 py-5">
       <div>
@@ -29,7 +38,15 @@ export default function Home() {
         <HowItWorks />
       </div>
       <div className="flex justify-center w-full">
-        <Button className="cursor-pointer bg-white text-gray-950 hover:bg-amber-500 hover:text-white">
+        <Button
+          className="cursor-pointer bg-white text-gray-950 hover:bg-amber-500 hover:text-white"
+          onClick={() => {
+            tracker.trackEvent("new_game", {
+              action: "new_game",
+              category: "engagement",
+            });
+          }}
+        >
           <Link to={`/play/${uuidv4()}`}>New Game 🎮</Link>
         </Button>
       </div>
