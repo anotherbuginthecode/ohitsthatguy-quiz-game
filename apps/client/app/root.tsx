@@ -39,9 +39,11 @@ function ClientOnlyAnalyticsProvider({
   children: React.ReactNode;
 }) {
   const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
     setIsClient(true);
   }, []);
+
   if (!isClient) return <>{children}</>;
   return (
     <AnalyticsProvider config={analyticsConfig}>{children}</AnalyticsProvider>
