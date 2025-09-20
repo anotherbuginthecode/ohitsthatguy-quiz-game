@@ -65,7 +65,7 @@ export default function GamePlay() {
   }, [location, tracker]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-10 px-5 items-center justify-center">
+    <div className="flex min-h-screen flex-col items-center gap-10 px-5">
       {step === 1 && (
         <Card className="max-w-md w-full bg-gray-950 border-0 text-white">
           <CardHeader>
