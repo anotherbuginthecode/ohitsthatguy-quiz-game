@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { AnalyticsProvider } from "@keiko-app/react-google-analytics";
+import { useEffect, useState } from "react";
 
 import type { Route } from "./+types/root";
 import Header from "~/components/Header";
@@ -32,6 +33,21 @@ const analyticsConfig = {
   verbose: false,
 };
 
+function ClientOnlyAnalyticsProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  if (!isClient) return <>{children}</>;
+  return (
+    <AnalyticsProvider config={analyticsConfig}>{children}</AnalyticsProvider>
+  );
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -42,7 +58,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <AnalyticsProvider config={analyticsConfig}>
+        <ClientOnlyAnalyticsProvider>
           <div
             className="bg-background bg-cover bg-center bg-fixed relative overflow-scroll font-baloo h-screen"
             style={{
@@ -54,7 +70,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </div>
           <ScrollRestoration />
           <Scripts />
-        </AnalyticsProvider>
+        </ClientOnlyAnalyticsProvider>
       </body>
     </html>
   );
