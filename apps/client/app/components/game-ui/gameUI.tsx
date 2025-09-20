@@ -146,10 +146,12 @@ export default function GameUI({
   // Timer countdown
   useEffect(() => {
     if (gamePhase === "playing" && timeLeft > 0) {
-      const timer = setTimeout(() => {
-        setTimeLeft(timeLeft - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
+      if (!isDemo) {
+        const timer = setTimeout(() => {
+          setTimeLeft(timeLeft - 1);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
     } else if (timeLeft === 0 && gamePhase === "playing") {
       if (round >= totalRound) {
         if (!isDemo) {
@@ -169,140 +171,166 @@ export default function GameUI({
   }, [timeLeft, gamePhase]);
 
   return (
-    <div>
-      {gamePhase !== "gameEnd" && (
-        <>
-          <div className="flex justify-between items-center mb-4">
-            <RoundCounter currentRound={round} totalRound={totalRound} />
-            <Score score={score} />
-          </div>
+    <div className="fixed inset-5 flex items-center justify-center z-30">
+      <div className="w-full">
+        <Card className="bg-gray-950 border-0 shadow-none w-full">
+          <CardContent className="flex flex-col items-center gap-4 py-6 px-2">
+            {gamePhase !== "gameEnd" && (
+              <>
+                <div className="flex justify-between items-center w-full mb-2 px-5">
+                  <RoundCounter currentRound={round} totalRound={totalRound} />
+                  <Score score={score} />
+                </div>
+              </>
+            )}
+            {gamePhase === "playing" && (
+              <div className="px-5 w-full max-w-md flex flex-col items-center gap-5">
+                <div className="flex flex-col items-center text-center">
+                  <ActorImage
+                    fullname={pickedActor?.name || ""}
+                    imageUrl={pickedActor?.image || ""}
+                  />
 
-          <Timer timeLeft={timeLeft} />
-        </>
-      )}
-      <Card className={`bg-gray-950 border-0 shadow-none`}>
-        <CardContent className="space-y-4 flex flex-col items-center">
-          {gamePhase === "playing" ? (
-            <>
-              {answerStatus === "correct" && (
-                <Alert status="correct" message={`+${points} points!`} />
-              )}
-              {answerStatus === "incorrect" && (
-                <Alert status="incorrect" message={`Incorrect`} />
-              )}
-              {answerStatus === "repeated" && (
-                <Alert status="repeated" message={`Repeated`} />
-              )}
-              <div className="flex flex-col items-center text-center p-2">
-                <ActorImage
-                  fullname={pickedActor?.name || ""}
-                  imageUrl={pickedActor?.image || ""}
-                />
-              </div>
-              <div className="w-full">
-                <Input
-                  className="text-gray-950 bg-white"
-                  onKeyDown={handleInputKeyDown}
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                />
-                {showHint && (
-                  <span className="text-sm text-white/50">
-                    es. {pickedActor?.movies[0]}
-                  </span>
+                  {answerStatus === "correct" && (
+                    <div className="mt-5">
+                      <Alert status="correct" message={`+${points} points!`} />
+                    </div>
+                  )}
+                  {answerStatus === "incorrect" && (
+                    <div className="mt-5">
+                      <Alert status="incorrect" message={`Incorrect`} />
+                    </div>
+                  )}
+                  {answerStatus === "repeated" && (
+                    <div className="mt-5">
+                      <Alert status="repeated" message={`Repeated`} />
+                    </div>
+                  )}
+                </div>
+                {answeredMovies.length > 0 && (
+                  <div className="mt-2 text-left w-full">
+                    <p className="text-sm text-white/50 mb-1">Answered:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {answeredMovies.map((movie, index) => (
+                        <span
+                          key={index}
+                          className="bg-yellow-300 text-gray-950 px-2 py-1 rounded-full text-xs"
+                        >
+                          {movie}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 )}
+                <div className="w-full max-w-md mx-auto flex flex-col gap-5">
+                  <Input
+                    className="text-gray-950 bg-white w-full"
+                    onKeyDown={handleInputKeyDown}
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
+                  />
+                  <div className="w-full flex justify-center">
+                    <Button className="text-xl bg-green-500">Submit</Button>
+                  </div>
+                  {showHint && (
+                    <span className="text-sm text-white/50 block mt-1">
+                      e.g. {pickedActor?.movies[0]}
+                    </span>
+                  )}
+                </div>
+                <div className="w-full absolute bottom-10">
+                  <Timer timeLeft={timeLeft} />
+                </div>
               </div>
-              {answeredMovies.length > 0 && (
-                <div className="mt-2 text-left w-full">
-                  <p className="text-sm text-white/50 mb-1">Answered:</p>
+            )}
+            {gamePhase === "roundEnd" && (
+              <div className="flex flex-col gap-5 p-2 w-full">
+                <div className="text-2xl text-white text-center">
+                  Your score:{" "}
+                  <span className="text-3xl text-yellow-300 font-bold">
+                    {score}
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <p className="text-sm text-white/50 mb-1">Your answers:</p>
+                  {answeredMovies.map((movie, index) => (
+                    <span
+                      key={index}
+                      className="bg-yellow-300 text-gray-950 px-2 py-1 rounded-full text-xs mr-2"
+                    >
+                      {movie}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-2">
+                  <p className="text-sm text-white/50 mb-1">
+                    Some films starring the actor:
+                  </p>
                   <div className="flex flex-wrap gap-2">
-                    {answeredMovies.map((movie, index) => (
+                    {pickedActor?.movies.map((movie, index) => (
                       <span
                         key={index}
-                        className="bg-amber-500 text-white px-2 py-1 rounded-full text-xs"
+                        className="bg-gray-800 text-white px-2 py-1 rounded-full text-xs"
                       >
                         {movie}
                       </span>
                     ))}
                   </div>
                 </div>
-              )}
-            </>
-          ) : gamePhase === "roundEnd" ? (
-            <div className="flex flex-col gap-5 p-2">
-              <div className="text-2xl text-white">
-                Your score:{" "}
-                <span className="text-3xl text-amber-500 font-bold">
-                  {score}
-                </span>
-              </div>
-              <div className="mt-2">
-                <p className="text-sm text-white/50 mb-1">Your answers:</p>
-                {answeredMovies.map((movie, index) => (
-                  <span
-                    key={index}
-                    className="bg-amber-500 text-white px-2 py-1 rounded-full text-xs mr-2"
-                  >
-                    {movie}
-                  </span>
-                ))}
-              </div>
-              <div className="mt-2">
-                <p className="text-sm text-white/50 mb-1">
-                  Some films starring the actor:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {pickedActor?.movies.map((movie, index) => (
-                    <span
-                      key={index}
-                      className="bg-gray-800 text-white px-2 py-1 rounded-full text-xs"
+                {!isDemo && (
+                  <div className="flex items-center justify-end">
+                    <Button
+                      className="flex items-center gap-2"
+                      onClick={handleNextRound}
                     >
-                      {movie}
-                    </span>
-                  ))}
-                </div>
+                      Next round
+                      <FaArrowRightLong />
+                    </Button>
+                  </div>
+                )}
               </div>
-              {!isDemo && (
-                <div className="flex items-center justify-end">
+            )}
+            {gamePhase === "gameEnd" && (
+              <div className="flex flex-col items-center gap-5 p-5 w-full">
+                <div className="text-4xl text-white font-bold">Game End!</div>
+                <div className="text-2xl text-white flex items-center gap-2">
+                  Your score:
+                  <span className="text-3xl text-yellow-300 font-bold">
+                    {score}
+                  </span>
+                </div>
+                <div className="mt-2 flex items-center justify-center">
                   <Button
-                    className="flex items-center gap-2"
-                    onClick={handleNextRound}
+                    onClick={() => {
+                      tracker.trackEvent("play_again", {
+                        action: "play_again",
+                        category: "engagement",
+                        gameId: gameUUID,
+                      });
+                    }}
                   >
-                    Next round
-                    <FaArrowRightLong />
+                    <Link
+                      to={`/play/${gameUUID}`}
+                      className="flex items-center gap-2"
+                      onClick={() => {
+                        setScore(0);
+                        setRound(1);
+                        setGamePhase("playing");
+                        setAnsweredMovies([]);
+                        setAnswerStatus(null);
+                        setTimeLeft(30);
+                      }}
+                    >
+                      <MdOutlineLoop />
+                      Play Again!
+                    </Link>
                   </Button>
                 </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-5 p-5">
-              <div className="text-4xl text-white font-bold">Game End!</div>
-              <div className="text-2xl text-white flex items-center gap-2">
-                Your score:
-                <span className="text-3xl text-amber-500 font-bold">
-                  {score}
-                </span>
               </div>
-              <div className="mt-2 flex items-center justify-center">
-                <Button
-                  onClick={() => {
-                    tracker.trackEvent("play_again", {
-                      action: "play_again",
-                      category: "engagement",
-                      gameId: gameUUID,
-                    });
-                  }}
-                >
-                  <Link to={`/play/${gameUUID}`}>
-                    <MdOutlineLoop />
-                    Play Again!
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

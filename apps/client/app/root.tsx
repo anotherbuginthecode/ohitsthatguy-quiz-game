@@ -60,7 +60,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <ClientOnlyAnalyticsProvider>
           <div
-            className="bg-background bg-cover bg-center bg-fixed relative overflow-scroll font-baloo h-screen"
+            className="bg-background bg-cover bg-center bg-fixed font-baloo h-dvh pt-30"
             style={{
               backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7)), url(${cinemaBg})`,
             }}

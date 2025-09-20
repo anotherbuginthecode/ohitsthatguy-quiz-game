@@ -17,7 +17,7 @@ export default function Score({ score }: { score: number }) {
       <p className="text-2xl">
         Score:{" "}
         <span
-          className={`text-amber-500 ${scoreChanged ? "animate-ping text-green-500" : ""}`}
+          className={`text-yellow-300 ${scoreChanged ? "animate-ping text-green-500" : ""}`}
         >
           {score}
         </span>

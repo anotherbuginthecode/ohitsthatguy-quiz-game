@@ -6,6 +6,8 @@ import { Link } from "react-router";
 import { v4 as uuidv4 } from "uuid";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
 import { useLocation } from "react-router";
+import HowToPlay from "~/components/HowToPlay";
+import { FaGamepad } from "react-icons/fa";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -27,19 +29,19 @@ export default function Home() {
   }, [location, tracker]);
 
   return (
-    <div className="flex min-h-screen items-center flex-col gap-10 px-10 py-5">
-      <div>
-        <p className="font-baloo-bold">
-          Think you can match the face to the movies? Test your memory and see
-          how many films you can remember before time's up!
-        </p>
+    <div className="flex flex-col items-center justify-center h-full gap-10 rounded-xl backdrop-blur-xs px-10 lg:px-20">
+      <div className="flex flex-col gap-5 text-center max-w-2xl">
+        <h1 className="font-baloo-bold text-3xl">
+          You’ve seen them before… where?
+        </h1>
+        <p className="font-baloo text-xl">Guess fast, climb the score!</p>
       </div>
-      <div className="w-full flex justify-center">
+      {/* <div className="w-full flex justify-center">
         <HowItWorks />
-      </div>
+      </div> */}
       <div className="flex justify-center w-full">
         <Button
-          className="cursor-pointer bg-white text-gray-950 hover:bg-amber-500 hover:text-white"
+          className="cursor-pointer bg-yellow-300 text-gray-950 hover:bg-yellow-300 hover:text-white md:w-full xl:w-fit"
           onClick={() => {
             tracker.trackEvent("new_game", {
               action: "new_game",
@@ -47,8 +49,16 @@ export default function Home() {
             });
           }}
         >
-          <Link to={`/play/${uuidv4()}`}>New Game 🎮</Link>
+          <Link
+            to={`/play/${uuidv4()}`}
+            className="flex justify-center items-center gap-2 text-lg"
+          >
+            New Game <FaGamepad />
+          </Link>
         </Button>
+      </div>
+      <div className="w-full flex justify-center">
+        <HowToPlay />
       </div>
     </div>
   );

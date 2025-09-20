@@ -65,7 +65,7 @@ export default function GamePlay() {
   }, [location, tracker]);
 
   return (
-    <div className="container flex min-h-screen flex-col items-center p-10 gap-10">
+    <div className="flex min-h-screen flex-col items-center gap-10 px-5 items-center justify-center">
       {step === 1 && (
         <Card className="max-w-md w-full bg-gray-950 border-0 text-white">
           <CardHeader>
@@ -79,8 +79,10 @@ export default function GamePlay() {
                   <Button
                     key={lang.code}
                     onClick={() => setLanguage(lang.code)}
-                    className={`flex-1 py-4 text-lg text-gray-950 bg-white hover:bg-amber-500 hover:text-white cursor-pointer ${
-                      language === lang.code ? "bg-amber-500 text-white" : ""
+                    className={`flex-1 py-4 text-lg text-gray-950 bg-white hover:bg-yellow-300 hover:text-gray-950 cursor-pointer ${
+                      language === lang.code
+                        ? "bg-yellow-300 text-gray-950"
+                        : ""
                     }`}
                     aria-pressed={language === lang.code}
                   >
@@ -104,7 +106,7 @@ export default function GamePlay() {
           </CardContent>
           <CardFooter>
             <Button
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white"
+              className="w-full bg-yellow-300 hover:bg-amber-600 text-gray-950 text-lg"
               onClick={handleStart}
               disabled={!language || rounds < 1}
             >
