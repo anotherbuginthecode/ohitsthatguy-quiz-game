@@ -1,56 +1,3 @@
-// Checks if the answer is correct, repeated, or incorrect
-export function checkMovieAnswer({
-  answer,
-  answeredMovies,
-  pickedActor,
-}: {
-  answer: string;
-  answeredMovies: string[];
-  pickedActor: PickedActor;
-}): "correct" | "incorrect" | "repeated" {
-  if (answeredMovies.includes(answer.trim())) {
-    return "repeated";
-  }
-  if (
-    pickedActor &&
-    pickedActor.movies.some((movie) => fuzzyMatch(movie, answer))
-  ) {
-    return "correct";
-  }
-  return "incorrect";
-}
-// Utility: Normalize string (remove punctuation, lowercase, trim)
-function normalize(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/[^\w\s]|_/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-// Utility: Fuzzy match (Levenshtein distance <= 2)
-function fuzzyMatch(a: string, b: string): boolean {
-  const s1 = normalize(a);
-  const s2 = normalize(b);
-  if (s1 === s2) return true;
-  // Levenshtein distance
-  const dp = Array(s1.length + 1)
-    .fill(null)
-    .map(() => Array(s2.length + 1).fill(0));
-  for (let i = 0; i <= s1.length; i++) dp[i][0] = i;
-  for (let j = 0; j <= s2.length; j++) dp[0][j] = j;
-  for (let i = 1; i <= s1.length; i++) {
-    for (let j = 1; j <= s2.length; j++) {
-      if (s1[i - 1] === s2[j - 1]) {
-        dp[i][j] = dp[i - 1][j - 1];
-      } else {
-        dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
-      }
-    }
-  }
-  return dp[s1.length][s2.length] <= 2;
-}
-
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "~/components/ui/card";
 import RoundCounter from "./roundCounter";
@@ -58,12 +5,15 @@ import Score from "./Score";
 import ActorImage from "./actorImage";
 import { Input } from "~/components/ui/input";
 import Timer from "./timer";
-import Alert from "./alert";
+import Feedback from "./feeback";
 import { Button } from "../ui/button";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { MdOutlineLoop } from "react-icons/md";
 import { Link, useLocation } from "react-router";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
+import { isTitleMatch } from "~/lib/utils";
+import { toast } from "sonner";
+import GiveAFeedbackBanner from "../GiveAFeedbackBanner";
 
 export type GamePhase = "playing" | "roundEnd" | "gameEnd";
 export type PickedActor = {
@@ -120,11 +70,14 @@ export default function GameUI({
   };
 
   const checkAnswer = () => {
-    const result = checkMovieAnswer({
-      answer,
-      answeredMovies,
-      pickedActor,
-    });
+    let result = "";
+    if (answeredMovies.includes(answer.trim())) {
+      result = "repeated";
+    } else {
+      result = isTitleMatch(answer, pickedActor?.movies || [])
+        ? "correct"
+        : "incorrect";
+    }
     if (result === "repeated") {
       setAnswerStatus("repeated");
       setAnswer("");
@@ -181,7 +134,7 @@ export default function GameUI({
   }, [timeLeft, gamePhase]);
 
   return (
-    <div className="fixed inset-5 flex items-center justify-center z-30">
+    <div className="inset-5 flex items-center justify-center z-30">
       <div className="w-full">
         <Card className="bg-gray-950 border-0 shadow-none w-full xl:max-w-xl mx-auto">
           <CardContent className="flex flex-col items-center gap-4 py-6 px-2">
@@ -203,17 +156,20 @@ export default function GameUI({
 
                   {answerStatus === "correct" && (
                     <div className="mt-5">
-                      <Alert status="correct" message={`+${points} points!`} />
+                      <Feedback
+                        status="correct"
+                        message={`+${points} points!`}
+                      />
                     </div>
                   )}
                   {answerStatus === "incorrect" && (
                     <div className="mt-5">
-                      <Alert status="incorrect" message={`Incorrect`} />
+                      <Feedback status="incorrect" message={`Incorrect`} />
                     </div>
                   )}
                   {answerStatus === "repeated" && (
                     <div className="mt-5">
-                      <Alert status="repeated" message={`Repeated`} />
+                      <Feedback status="repeated" message={`Repeated`} />
                     </div>
                   )}
                 </div>
@@ -256,7 +212,7 @@ export default function GameUI({
                     </span>
                   )}
                 </div>
-                <div className="w-full xl:max-w-xl absolute bottom-10">
+                <div className="w-full xl:max-w-xl absolute bottom-25">
                   <Timer timeLeft={timeLeft} />
                 </div>
               </div>
@@ -312,42 +268,83 @@ export default function GameUI({
               </div>
             )}
             {gamePhase === "gameEnd" && (
-              <div className="flex flex-col items-center gap-5 p-5 w-full">
-                <div className="text-4xl text-white font-bold">Game End!</div>
-                <div className="text-2xl text-white flex items-center gap-2">
-                  Your score:
-                  <span className="text-3xl text-yellow-300 font-bold">
-                    {score}
-                  </span>
-                </div>
-                <div className="mt-2 flex items-center justify-center">
-                  <Button
-                    onClick={() => {
-                      tracker.trackEvent("play_again", {
-                        action: "play_again",
-                        category: "engagement",
-                        gameId: gameUUID,
-                      });
-                    }}
-                  >
-                    <Link
-                      to={`/play/${gameUUID}`}
-                      className="flex items-center gap-2"
+              <>
+                <div className="flex flex-col items-center gap-5 p-5 w-full overflow-y-scroll max-h-[70vh]">
+                  <GiveAFeedbackBanner />
+                  <div className="text-4xl text-white font-bold">Game End!</div>
+                  <div className="text-2xl text-white flex items-center gap-2">
+                    Your score:
+                    <span className="text-3xl text-yellow-300 font-bold">
+                      {score}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex items-center justify-center">
+                    <Button
                       onClick={() => {
-                        setScore(0);
-                        setRound(1);
-                        setGamePhase("playing");
-                        setAnsweredMovies([]);
-                        setAnswerStatus(null);
-                        setTimeLeft(30);
+                        tracker.trackEvent("play_again", {
+                          action: "play_again",
+                          category: "engagement",
+                          gameId: gameUUID,
+                        });
                       }}
                     >
-                      <MdOutlineLoop />
-                      Play Again!
-                    </Link>
-                  </Button>
+                      <Link
+                        to={`/play/${gameUUID}`}
+                        className="flex items-center gap-2"
+                        onClick={() => {
+                          setScore(0);
+                          setRound(1);
+                          setGamePhase("playing");
+                          setAnsweredMovies([]);
+                          setAnswerStatus(null);
+                          setTimeLeft(30);
+                        }}
+                      >
+                        <MdOutlineLoop />
+                        Play Again!
+                      </Link>
+                    </Button>
+                  </div>
+                  <div className="mt-5">
+                    <ActorImage
+                      fullname={pickedActor?.name || ""}
+                      imageUrl={pickedActor?.image || ""}
+                    />
+                  </div>
+
+                  <div className="mt-2 text-left w-full">
+                    <p className="text-sm text-white/50 mb-1">Answered:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {answeredMovies.map((movie, index) => (
+                        <span
+                          key={index}
+                          className="bg-yellow-300 text-gray-950 px-2 py-1 rounded-full text-xs"
+                        >
+                          {movie}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-sm text-white/50 mb-1">
+                      Some films starring the actor:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {pickedActor?.movies
+                        .sort(() => Math.random() - 0.5)
+                        .slice(0, 10)
+                        .map((movie, index) => (
+                          <span
+                            key={index}
+                            className="bg-gray-800 text-white px-2 py-1 rounded-full text-xs"
+                          >
+                            {movie}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </CardContent>
         </Card>

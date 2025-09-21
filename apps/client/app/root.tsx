@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 
 import type { Route } from "./+types/root";
 import Header from "~/components/Header";
+import { Toaster } from "~/components/ui/sonner";
 import "./app.css";
 import cinemaBg from "./assets/cinema-bg.jpg";
 
@@ -72,13 +73,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <ClientOnlyAnalyticsProvider>
           <div
-            className="bg-background bg-cover bg-center bg-fixed font-baloo h-dvh pt-30"
+            className="bg-background bg-cover bg-center bg-fixed font-baloo h-dvh pt-30 overflow-y-hidden"
             style={{
               backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7)), url(${cinemaBg})`,
             }}
           >
             <Header />
-            {children}
+            <main>{children}</main>
+            <Toaster />
           </div>
           <ScrollRestoration />
           <Scripts />

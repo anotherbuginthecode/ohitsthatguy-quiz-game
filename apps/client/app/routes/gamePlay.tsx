@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import GameUI from "../components/game-ui/gameUI";
 import { mockActorsENG, mockActorsITA } from "~/lib/mock";
 import { trackNewGame } from "~/lib/ga-utils";
@@ -25,6 +25,7 @@ export default function GamePlay() {
   const { gameId } = useParams();
   const [language, setLanguage] = useState<string | null>(null);
   const [rounds, setRounds] = useState(3);
+  const [currentRound, setCurrentRound] = useState(1);
   const [actor, setActor] = useState<Actor | null>(null);
   const [actors, setActors] = useState<Actor[]>([]);
 
@@ -71,6 +72,7 @@ export default function GamePlay() {
 
   function handleNextRound() {
     if (actors.length > 0) {
+      setCurrentRound(currentRound + 1);
       const currentIndex = actors.findIndex((a) => a.id === actor?.id);
       const nextIndex = currentIndex + 1;
       if (nextIndex < actors.length) {
@@ -92,8 +94,6 @@ export default function GamePlay() {
       setActor(actors[0]);
     }
   }, [actors]);
-
-  console.log(actors);
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-10 px-5">

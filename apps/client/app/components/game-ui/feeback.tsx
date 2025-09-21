@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function Alert({
+export default function Feedback({
   message,
   status,
 }: {
@@ -24,8 +24,8 @@ export default function Alert({
           status === "correct"
             ? "text-green-500 border-green-500"
             : status === "incorrect"
-              ? "text-red-500 border-red-500"
-              : "text-yellow-500 border-yellow-500"
+            ? "text-red-500 border-red-500"
+            : "text-yellow-500 border-yellow-500"
         }`}
       >
         {message}
