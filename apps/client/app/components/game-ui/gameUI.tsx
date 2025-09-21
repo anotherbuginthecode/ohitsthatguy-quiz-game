@@ -158,7 +158,7 @@ export default function GameUI({
     if (gamePhase === "playing" && timeLeft > 0) {
       if (!isDemo) {
         const timer = setTimeout(() => {
-          // setTimeLeft(timeLeft - 1);
+          setTimeLeft(timeLeft - 1);
         }, 1000);
         return () => clearTimeout(timer);
       }
@@ -238,6 +238,9 @@ export default function GameUI({
                     onKeyDown={handleInputKeyDown}
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    spellCheck={false}
                   />
                   <div className="w-full flex justify-center">
                     <Button

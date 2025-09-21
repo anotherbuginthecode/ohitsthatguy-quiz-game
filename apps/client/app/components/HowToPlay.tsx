@@ -12,7 +12,7 @@ export default function HowToPlay() {
         </div>
         <div>
           <FaFilm className="mx-auto mb-2 text-4xl" />
-          <h3 className="font-baloo-semibold text-sm mb-1">Type the movie</h3>
+          <h3 className="font-baloo-semibold text-sm mb-1">Type the movies</h3>
         </div>
         <div>
           <FaTrophy className="mx-auto mb-2 text-4xl" />

@@ -30,7 +30,7 @@ export default defineConfig({
         start_url: "/",
         background_color: "#030712",
         theme_color: "#030712",
-        display: "standalone",
+        display: "fullscreen",
         icons: icons.icons.map((icon) => ({
           ...icon,
           src: icon.src.startsWith("/") ? icon.src : "/" + icon.src,
