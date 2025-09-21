@@ -1,19 +1,10 @@
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "~/components/ui/card";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import GameUI from "../components/game-ui/gameUI";
 import { mockActorsENG, mockActorsITA } from "~/lib/mock";
 import { trackNewGame } from "~/lib/ga-utils";
 import { useParams, useLocation } from "react-router";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
-import { use } from "react";
+import { fetchData } from "~/lib/api";
 
 // const LANGUAGES = [
 //   { code: "it", label: "Italiano", flag: "🇮🇹" },
@@ -35,13 +26,36 @@ export default function GamePlay() {
   const [language, setLanguage] = useState<string | null>(null);
   const [rounds, setRounds] = useState(3);
   const [actor, setActor] = useState<Actor | null>(null);
+  const [actors, setActors] = useState<Actor[]>([]);
 
-  function pickRandomActor() {
-    // Mock data per il MVP - sostituire con API TMDB
-    // const mockActors = language === "it" ? mockActorsITA : mockActorsENG;
-    const mockActors = mockActorsENG;
-    const randomIndex = Math.floor(Math.random() * mockActors.length);
-    setActor(mockActors[randomIndex]);
+  function transformActorPayload(apiPayload: {
+    tmdb_id: number;
+    name: string;
+    image: string;
+    movies: { original_title: string }[];
+  }): {
+    id: number;
+    name: string;
+    image: string;
+    movies: string[];
+  } {
+    return {
+      id: apiPayload.tmdb_id,
+      name: apiPayload.name,
+      image: `https://image.tmdb.org/t/p/w500${apiPayload.image}`,
+      movies: apiPayload.movies.map((movie) => movie.original_title),
+    };
+  }
+
+  async function pickRandomActor() {
+    try {
+      const res = await fetchData(`api/actors`);
+      const data = res.data;
+      const actors = data.map(transformActorPayload);
+      setActors(actors);
+    } catch (error) {
+      console.error("Failed to fetch game settings:", error);
+    }
   }
 
   function handleStart() {
@@ -56,7 +70,13 @@ export default function GamePlay() {
   }
 
   function handleNextRound() {
-    pickRandomActor();
+    if (actors.length > 0) {
+      const currentIndex = actors.findIndex((a) => a.id === actor?.id);
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < actors.length) {
+        setActor(actors[nextIndex]);
+      }
+    }
   }
 
   useEffect(() => {
@@ -66,6 +86,14 @@ export default function GamePlay() {
   useEffect(() => {
     handleStart();
   }, []);
+
+  useEffect(() => {
+    if (actors.length > 0) {
+      setActor(actors[0]);
+    }
+  }, [actors]);
+
+  console.log(actors);
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-10 px-5">
