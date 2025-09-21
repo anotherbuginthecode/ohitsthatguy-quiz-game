@@ -285,14 +285,17 @@ export default function GameUI({
                     Some films starring the actor:
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {pickedActor?.movies.map((movie, index) => (
-                      <span
-                        key={index}
-                        className="bg-gray-800 text-white px-2 py-1 rounded-full text-xs"
-                      >
-                        {movie}
-                      </span>
-                    ))}
+                    {pickedActor?.movies
+                      .sort(() => Math.random() - 0.5)
+                      .slice(0, 10)
+                      .map((movie, index) => (
+                        <span
+                          key={index}
+                          className="bg-gray-800 text-white px-2 py-1 rounded-full text-xs"
+                        >
+                          {movie}
+                        </span>
+                      ))}
                   </div>
                 </div>
                 {!isDemo && (
