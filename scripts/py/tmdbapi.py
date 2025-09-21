@@ -31,12 +31,13 @@ def get_actor_tmdb_info(actor: str) -> Actor | None:
 
 
 def get_list_all_movies_of_actor(tmdb_id: int) -> list[dict]:
-    url = f"https://api.themoviedb.org/3/person/{tmdb_id}/movie_credits&language=en-US"
+    url = f"https://api.themoviedb.org/3/person/{tmdb_id}/movie_credits"
     response = requests.get(url, headers=headers)
     data = response.json()
 
     movies = []
-    for result in data.get("results", []):
+
+    for result in data.get("cast", []):
         if result.get("original_language") in ("it", "en"):
             movies.append(
                 {
