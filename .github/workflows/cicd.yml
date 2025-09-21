@@ -25,7 +25,7 @@ jobs:
         run: npm install -g pnpm
 
       - name: Install dependencies
-        run: pnpm install
+        run: cd apps/client && pnpm install
 
       - name: Create .env file
         run: echo "VITE_APP_GA4_MEASUREMENT_ID=${{ secrets.VITE_APP_GA4_MEASUREMENT_ID }}" > apps/client/.env
