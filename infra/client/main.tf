@@ -1,3 +1,24 @@
+terraform {
+	backend "s3" {
+		bucket         = "ohitsthatguy-tfstate"
+		key            = "infra/client/terraform.tfstate"
+		region         = "eu-west-1"
+		encrypt        = true
+	}
+}
+
+provider "aws" {
+	region = "us-east-1" # North Virginia per ACM
+  profile = "anotherbuginthecode"
+}
+
+provider "aws" {
+	alias  = "eu"
+	region = "eu-west-1"
+  profile = "anotherbuginthecode"
+}
+
+
 resource "aws_s3_bucket_policy" "static_site_oac" {
 	provider = aws.eu
 	bucket   = aws_s3_bucket.static_site.id
@@ -17,26 +38,6 @@ resource "aws_s3_bucket_policy" "static_site_oac" {
 			}
 		]
 	})
-}
-
-terraform {
-	backend "s3" {
-		bucket         = "ohitsthatguy-tfstate"
-		key            = "infra/client/terraform.tfstate"
-		region         = "eu-west-1"
-		encrypt        = true
-	}
-}
-
-provider "aws" {
-	region = "us-east-1" # North Virginia per ACM
-  profile = "anotherbuginthecode"
-}
-
-provider "aws" {
-	alias  = "eu"
-	region = "eu-west-1"
-  profile = "anotherbuginthecode"
 }
 
 data "aws_acm_certificate" "cert" {
