@@ -4,7 +4,7 @@ import { mockActorsENG, mockActorsITA } from "~/lib/mock";
 import { trackNewGame } from "~/lib/ga-utils";
 import { useParams, useLocation } from "react-router";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
-import { fetchData } from "~/lib/api";
+import { fetchData, postData } from "~/lib/api";
 
 // const LANGUAGES = [
 //   { code: "it", label: "Italiano", flag: "🇮🇹" },
@@ -59,6 +59,16 @@ export default function GamePlay() {
     }
   }
 
+  async function storeGameSession() {
+    try {
+      const res = await postData(`api/sessions?game_uuid=${gameId}`, {});
+      const data = res.data;
+      console.log("Game session stored:", data);
+    } catch (error) {
+      console.error("Failed to store game session:", error);
+    }
+  }
+
   function handleStart() {
     pickRandomActor();
     trackNewGame(tracker, "new_game", {
@@ -87,6 +97,7 @@ export default function GamePlay() {
 
   useEffect(() => {
     handleStart();
+    storeGameSession();
   }, []);
 
   useEffect(() => {

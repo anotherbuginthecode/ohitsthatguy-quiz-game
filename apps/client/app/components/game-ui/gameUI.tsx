@@ -12,7 +12,6 @@ import { MdOutlineLoop } from "react-icons/md";
 import { Link, useLocation } from "react-router";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
 import { isTitleMatch } from "~/lib/utils";
-import { toast } from "sonner";
 import GiveAFeedbackBanner from "../GiveAFeedbackBanner";
 
 export type GamePhase = "playing" | "roundEnd" | "gameEnd";
