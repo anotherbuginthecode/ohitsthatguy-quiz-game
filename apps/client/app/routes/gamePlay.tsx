@@ -91,6 +91,12 @@ export default function GamePlay() {
     }
   }
 
+  function handlePlayAgain() {
+    pickRandomActor();
+    setCurrentRound(1);
+    storeGameSession();
+  }
+
   useEffect(() => {
     tracker.trackPageView({});
   }, [location, tracker]);
@@ -115,6 +121,7 @@ export default function GamePlay() {
           pickedActor={actor}
           showHint={false}
           onNextRound={handleNextRound}
+          onPlayAgain={handlePlayAgain}
         />
       </div>
     </div>

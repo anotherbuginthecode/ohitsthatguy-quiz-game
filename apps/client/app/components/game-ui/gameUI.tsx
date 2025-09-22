@@ -30,6 +30,7 @@ export default function GameUI({
   onRoundEnd,
   onGameEnd,
   onNextRound,
+  onPlayAgain,
 }: {
   pickedActor: PickedActor;
   totalRound: number;
@@ -39,6 +40,7 @@ export default function GameUI({
   onRoundEnd?: () => void;
   onGameEnd?: () => void;
   onNextRound?: () => void;
+  onPlayAgain?: () => void;
 }) {
   const location = useLocation();
   const { tracker } = useAnalytics();
@@ -187,7 +189,7 @@ export default function GameUI({
                     </div>
                   </div>
                 )}
-                <div className="w-full max-w-md mx-auto flex flex-col gap-5">
+                <div className="w-full max-w-md mx-auto flex items-center gap-2">
                   <Input
                     className="text-gray-950 bg-white w-full"
                     onKeyDown={handleInputKeyDown}
@@ -197,7 +199,7 @@ export default function GameUI({
                     autoCorrect="off"
                     spellCheck={false}
                   />
-                  <div className="w-full flex justify-center">
+                  <div className="w-fit flex justify-center">
                     <Button
                       className="text-xl bg-green-500"
                       onClick={(e) => handleSubmit(e)}
@@ -205,13 +207,8 @@ export default function GameUI({
                       Submit
                     </Button>
                   </div>
-                  {showHint && (
-                    <span className="text-sm text-white/50 block mt-1">
-                      e.g. {pickedActor?.movies[0]}
-                    </span>
-                  )}
                 </div>
-                <div className="w-full xl:max-w-xl absolute bottom-25">
+                <div className="w-full xl:max-w-xl px-10">
                   <Timer timeLeft={timeLeft} />
                 </div>
               </div>
@@ -293,6 +290,7 @@ export default function GameUI({
                         onClick={() => {
                           setScore(0);
                           setRound(1);
+                          onPlayAgain && onPlayAgain();
                           setGamePhase("playing");
                           setAnsweredMovies([]);
                           setAnswerStatus(null);
