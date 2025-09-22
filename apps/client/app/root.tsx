@@ -73,13 +73,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <ClientOnlyAnalyticsProvider>
           <div
-            className="bg-background bg-cover bg-center bg-fixed font-baloo h-dvh pt-30 overflow-y-hidden"
+            className="bg-background bg-cover bg-center bg-fixed font-baloo h-dvh overflow-y-hidden"
             style={{
-              backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7)), url(${cinemaBg})`,
+              backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.8)), url(${cinemaBg})`,
             }}
           >
-            <Header />
-            <main>{children}</main>
+            <main className="h-dvh">{children}</main>
             <Toaster />
           </div>
           <ScrollRestoration />
