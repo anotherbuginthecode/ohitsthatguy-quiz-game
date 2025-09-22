@@ -43,18 +43,16 @@ export default function Home() {
         <HowItWorks />
       </div> */}
       <div className="flex justify-center w-full">
-        <Button
-          className="cursor-pointer bg-yellow-300 text-gray-950 hover:bg-yellow-300 hover:text-white md:w-full xl:w-fit"
-          onClick={() => {
-            tracker.trackEvent("new_game", {
-              action: "new_game",
-              category: "engagement",
-            });
-          }}
-        >
+        <Button className="cursor-pointer bg-yellow-300 text-gray-950 hover:bg-yellow-300 hover:text-white md:w-full xl:w-fit">
           <Link
             to={`/play/${uuidv4()}`}
             className="flex justify-center items-center gap-2 text-lg"
+            onClick={() => {
+              tracker.trackEvent("new_game", {
+                action: "new_game",
+                category: "engagement",
+              });
+            }}
           >
             New Game <FaGamepad />
           </Link>
