@@ -25,7 +25,6 @@ export default function GameUI({
   pickedActor,
   totalRound,
   showHint = false,
-  isDemo = false,
   gameUUID,
   onRoundEnd,
   onGameEnd,
@@ -35,7 +34,6 @@ export default function GameUI({
   pickedActor: PickedActor;
   totalRound: number;
   showHint: boolean;
-  isDemo?: boolean;
   gameUUID?: string;
   onRoundEnd?: () => void;
   onGameEnd?: () => void;
@@ -72,6 +70,7 @@ export default function GameUI({
 
   const checkAnswer = () => {
     let result = "";
+    if (!answer.trim()) return;
     if (answeredMovies.includes(answer.trim())) {
       result = "repeated";
     } else {
@@ -110,20 +109,14 @@ export default function GameUI({
   // Timer countdown
   useEffect(() => {
     if (gamePhase === "playing" && timeLeft > 0) {
-      if (!isDemo) {
-        const timer = setTimeout(() => {
-          setTimeLeft(timeLeft - 1);
-        }, 1000);
-        return () => clearTimeout(timer);
-      }
+      const timer = setTimeout(() => {
+        setTimeLeft(timeLeft - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
     } else if (timeLeft === 0 && gamePhase === "playing") {
       if (round >= totalRound) {
-        if (!isDemo) {
-          setGamePhase("gameEnd");
-          onGameEnd && onGameEnd();
-        } else {
-          setGamePhase("roundEnd");
-        }
+        setGamePhase("gameEnd");
+        onGameEnd && onGameEnd();
       } else {
         setGamePhase("roundEnd");
         onRoundEnd && onRoundEnd();
@@ -158,6 +151,7 @@ export default function GameUI({
                   {answerStatus === "correct" && (
                     <div className="mt-5">
                       <Feedback
+                        key={`feedback-correct-${Date.now()}`}
                         status="correct"
                         message={`+${points} points!`}
                       />
@@ -165,12 +159,20 @@ export default function GameUI({
                   )}
                   {answerStatus === "incorrect" && (
                     <div className="mt-5">
-                      <Feedback status="incorrect" message={`Incorrect`} />
+                      <Feedback
+                        key={`feedback-incorrect-${Date.now()}`}
+                        status="incorrect"
+                        message={`Incorrect`}
+                      />
                     </div>
                   )}
                   {answerStatus === "repeated" && (
                     <div className="mt-5">
-                      <Feedback status="repeated" message={`Repeated`} />
+                      <Feedback
+                        key={`feedback-repeated-${Date.now()}`}
+                        status="repeated"
+                        message={`Repeated`}
+                      />
                     </div>
                   )}
                 </div>
@@ -192,6 +194,7 @@ export default function GameUI({
                 <div className="w-full max-w-md mx-auto flex items-center gap-2">
                   <Input
                     className="text-gray-950 bg-white w-full"
+                    placeholder="🎬 Type a movie title..."
                     onKeyDown={handleInputKeyDown}
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}
@@ -214,7 +217,7 @@ export default function GameUI({
               </div>
             )}
             {gamePhase === "roundEnd" && (
-              <div className="flex flex-col gap-5 p-2 w-full">
+              <div className="flex flex-col gap-5 p-2 w-full overflow-y-scroll max-h-[70vh]">
                 <div className="text-2xl text-white text-center">
                   Your score:{" "}
                   <span className="text-3xl text-yellow-300 font-bold">
@@ -250,17 +253,15 @@ export default function GameUI({
                       ))}
                   </div>
                 </div>
-                {!isDemo && (
-                  <div className="flex items-center justify-end">
-                    <Button
-                      className="flex items-center gap-2"
-                      onClick={handleNextRound}
-                    >
-                      Next round
-                      <FaArrowRightLong />
-                    </Button>
-                  </div>
-                )}
+                <div className="flex items-center justify-end">
+                  <Button
+                    className="flex items-center gap-2"
+                    onClick={handleNextRound}
+                  >
+                    Next round
+                    <FaArrowRightLong />
+                  </Button>
+                </div>
               </div>
             )}
             {gamePhase === "gameEnd" && (
