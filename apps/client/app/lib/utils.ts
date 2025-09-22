@@ -10,6 +10,7 @@ import { distance } from "fastest-levenshtein";
 function normalize(str: string): string {
   return str
     .toLowerCase()
+    .replace(/&/g, " and ") // sostituisce & con and
     .replace(/[^a-z0-9\s]/gi, "") // rimuove punteggiatura
     .replace(/\s+/g, " ") // spazi multipli → singolo
     .trim();
