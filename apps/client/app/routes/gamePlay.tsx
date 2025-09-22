@@ -5,6 +5,8 @@ import { trackNewGame } from "~/lib/ga-utils";
 import { useParams, useLocation } from "react-router";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
 import { fetchData, postData } from "~/lib/api";
+import HowToPlay from "~/components/HowToPlay";
+import Header from "~/components/Header";
 
 // const LANGUAGES = [
 //   { code: "it", label: "Italiano", flag: "🇮🇹" },
@@ -28,6 +30,9 @@ export default function GamePlay() {
   const [currentRound, setCurrentRound] = useState(1);
   const [actor, setActor] = useState<Actor | null>(null);
   const [actors, setActors] = useState<Actor[]>([]);
+  const [steps, setSteps] = useState<"instructions" | "loading" | "playing">(
+    "instructions"
+  );
 
   function transformActorPayload(apiPayload: {
     tmdb_id: number;
@@ -70,6 +75,7 @@ export default function GamePlay() {
   }
 
   function handleStart() {
+    setSteps("loading");
     pickRandomActor();
     trackNewGame(tracker, "new_game", {
       action: "new_game_started",
@@ -102,27 +108,41 @@ export default function GamePlay() {
   }, [location, tracker]);
 
   useEffect(() => {
-    handleStart();
-    storeGameSession();
-  }, []);
-
-  useEffect(() => {
     if (actors.length > 0) {
       setActor(actors[0]);
+      setSteps("playing");
     }
   }, [actors]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-10 px-5">
-      <div className="w-full max-w-2xl">
-        <GameUI
-          gameUUID={gameId}
-          totalRound={rounds}
-          pickedActor={actor}
-          showHint={false}
-          onNextRound={handleNextRound}
-          onPlayAgain={handlePlayAgain}
-        />
+    <div>
+      <Header />
+
+      <div className="flex min-h-screen flex-col items-center gap-10 px-5 justify-center">
+        <div className="w-full max-w-2xl">
+          {steps === "instructions" && (
+            <HowToPlay onStart={() => handleStart()} />
+          )}
+          {steps === "loading" && (
+            <div>
+              <img
+                src="https://tenor.com/view/launch-product-countdown-counting-gif-12478823.gif"
+                alt="Loading..."
+                className="h-32 mx-auto"
+              />
+            </div>
+          )}
+          {steps === "playing" && actor && (
+            <GameUI
+              gameUUID={gameId}
+              totalRound={rounds}
+              pickedActor={actor}
+              showHint={false}
+              onNextRound={handleNextRound}
+              onPlayAgain={handlePlayAgain}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

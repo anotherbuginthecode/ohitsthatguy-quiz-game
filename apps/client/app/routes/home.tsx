@@ -6,8 +6,8 @@ import { Link } from "react-router";
 import { v4 as uuidv4 } from "uuid";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
 import { useLocation } from "react-router";
-import HowToPlay from "~/components/HowToPlay";
 import { FaGamepad } from "react-icons/fa";
+import Logo from "~/assets/logo.png";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -29,10 +29,13 @@ export default function Home() {
   }, [location, tracker]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-10 rounded-xl backdrop-blur-xs px-10 lg:px-20">
+    <div className="flex flex-col items-center justify-center gap-10 rounded-xl backdrop-blur-xs px-10 lg:px-20 h-full">
+      <div>
+        <img src={Logo} alt="Oh it's that guy!" className="h-32" />
+      </div>
       <div className="flex flex-col gap-5 text-center max-w-2xl">
         <h1 className="font-baloo-bold text-3xl">
-          You’ve seen them before… where?
+          You’ve seen the actor before… where?
         </h1>
         <p className="font-baloo text-xl">Guess fast, climb the score!</p>
       </div>
@@ -56,9 +59,6 @@ export default function Home() {
             New Game <FaGamepad />
           </Link>
         </Button>
-      </div>
-      <div className="w-full flex justify-center">
-        <HowToPlay />
       </div>
     </div>
   );
