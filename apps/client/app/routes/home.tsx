@@ -23,6 +23,8 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   const location = useLocation();
   const { tracker } = useAnalytics();
+  const uuid =
+    process.env.NODE_ENV === "development" ? "1111-1111-1111-1111" : uuidv4();
 
   useEffect(() => {
     tracker.trackPageView({});
@@ -45,7 +47,7 @@ export default function Home() {
       <div className="flex justify-center w-full">
         <Button className="cursor-pointer bg-yellow-300 text-gray-950 hover:bg-yellow-300 hover:text-white w-fit">
           <Link
-            to={`/play/${uuidv4()}`}
+            to={`/play/${uuid}`}
             className="flex justify-center items-center gap-2 text-lg"
             onClick={() => {
               tracker.trackEvent("new_game", {
