@@ -34,6 +34,8 @@ export function trackRetention(tracker: GoogleAnalyticsTracker) {
   if (retentionDays.includes(daysSince)) {
     sendAnalyticsEvent(tracker, `retention_d${daysSince}`, { anonymousId });
   }
+
+  return anonymousId;
 }
 
 // Mock invio evento a GA4

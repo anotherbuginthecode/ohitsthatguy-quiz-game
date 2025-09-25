@@ -8,6 +8,7 @@ import {
   CardContent,
 } from "~/components/ui/card";
 import { Button } from "./ui/button";
+import { Badge } from "~/components/ui/badge";
 
 export default function HowToPlay({ onStart }: { onStart: () => void }) {
   const instructions = [
@@ -25,6 +26,13 @@ export default function HowToPlay({ onStart }: { onStart: () => void }) {
       icon: "👤",
       title: "3 Rounds, 3 Actors",
       description: "Each round features a new actor.",
+    },
+
+    {
+      icon: "🔀",
+      title: "Shuffle Option",
+      description: "Can't recall? Shuffle to get a new actor (limited uses).",
+      badge: "new",
     },
 
     {
@@ -52,8 +60,13 @@ export default function HowToPlay({ onStart }: { onStart: () => void }) {
           >
             <span className="text-2xl">{item.icon}</span>
             <div>
-              <span className="font-baloo-bold text-md text-foreground">
-                {item.title}
+              <span className="font-baloo-bold text-md text-foreground flex gap-2">
+                {item.title}{" "}
+                {item.badge && (
+                  <Badge className="bg-yellow-300 text-gray-950">
+                    {item.badge}
+                  </Badge>
+                )}
               </span>
               <p className="text-sm text-muted-foreground">
                 {item.description}

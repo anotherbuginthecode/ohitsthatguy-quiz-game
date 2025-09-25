@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import HowItWorks from "~/components/HowItWorks";
 import type { Route } from "./+types/home";
 import { Button } from "~/components/ui/button";
@@ -24,15 +24,19 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   const location = useLocation();
   const { tracker } = useAnalytics();
-  const uuid =
-    process.env.NODE_ENV === "development" ? "1111-1111-1111-1111" : uuidv4();
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
     tracker.trackPageView({});
-    trackRetention(tracker);
+    const currentSessionUUID = trackRetention(tracker);
+    setSessionId(currentSessionUUID);
     sendAnalyticsEvent(tracker, "session_start", {
       action: "land_home",
       category: "engagement",
+      sessionid:
+        process.env.NODE_ENV === "development"
+          ? "11111111-1111-1111-1111-111111111111"
+          : currentSessionUUID,
     });
   }, [location, tracker]);
 
@@ -53,12 +57,13 @@ export default function Home() {
       <div className="flex justify-center w-full">
         <Button className="cursor-pointer bg-yellow-300 text-gray-950 hover:bg-yellow-300 hover:text-white w-fit">
           <Link
-            to={`/play/${uuid}`}
+            to={`/play/${sessionId}`}
             className="flex justify-center items-center gap-2 text-lg"
             onClick={() => {
               sendAnalyticsEvent(tracker, "new_game", {
                 action: "new_game",
                 category: "engagement",
+                sessionid: sessionId,
               });
             }}
           >

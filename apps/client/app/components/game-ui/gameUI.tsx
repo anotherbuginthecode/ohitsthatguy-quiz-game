@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { act, use, useEffect, useState } from "react";
 import { Card, CardContent } from "~/components/ui/card";
 import RoundCounter from "./roundCounter";
 import Score from "./Score";
@@ -13,6 +13,12 @@ import { Link, useLocation } from "react-router";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
 import { isTitleMatch } from "~/lib/utils";
 import GiveAFeedbackBanner from "../GiveAFeedbackBanner";
+import { sendAnalyticsEvent } from "~/lib/ga-tracker";
+import { FaShuffle } from "react-icons/fa6";
+import QuickFeedback from "./QuickFeedback";
+import { BsSkipForwardFill } from "react-icons/bs";
+
+import { postData } from "~/lib/api";
 
 export type GamePhase = "playing" | "roundEnd" | "gameEnd";
 export type PickedActor = {
@@ -27,18 +33,18 @@ export default function GameUI({
   showHint = false,
   gameUUID,
   onRoundEnd,
-  onGameEnd,
   onNextRound,
   onPlayAgain,
+  onShuffleActor,
 }: {
   pickedActor: PickedActor;
   totalRound: number;
   showHint: boolean;
   gameUUID?: string;
   onRoundEnd?: () => void;
-  onGameEnd?: () => void;
   onNextRound?: () => void;
   onPlayAgain?: () => void;
+  onShuffleActor?: () => void;
 }) {
   const location = useLocation();
   const { tracker } = useAnalytics();
@@ -46,6 +52,7 @@ export default function GameUI({
   const [score, setScore] = useState(0);
   const [points, setPoints] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
+  const [shuffle, setShuffle] = useState(1);
   // Removed unused isRunning state
   const [answerStatus, setAnswerStatus] = useState<
     "correct" | "incorrect" | "repeated" | null
@@ -55,15 +62,28 @@ export default function GameUI({
     "playing" | "roundEnd" | "gameEnd"
   >("playing");
   const [answeredMovies, setAnsweredMovies] = useState<string[]>([]);
+  const [showSurvey, setShowSurvey] = useState(false);
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === "Return") {
+      sendAnalyticsEvent(tracker, "submit_answer", {
+        action: "submit_answer",
+        category: "engagement",
+        label: `round_${round}`,
+        sessionid: gameUUID,
+      });
       e.preventDefault();
       checkAnswer();
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
+    sendAnalyticsEvent(tracker, "submit_answer_btn", {
+      action: "submit_answer",
+      category: "engagement",
+      label: `round_${round}`,
+      sessionid: gameUUID,
+    });
     e.preventDefault();
     checkAnswer();
   };
@@ -106,6 +126,35 @@ export default function GameUI({
     onNextRound && onNextRound();
   };
 
+  const trackFeedback = (
+    feedback: "yes" | "no",
+    event: string = "round_feedback"
+  ) => {
+    sendAnalyticsEvent(tracker, event, {
+      action: event,
+      category: "engagement",
+      label: feedback,
+      round: round,
+      actor: pickedActor?.name || "",
+      sessionid: gameUUID,
+    });
+
+    const payload = {
+      event: event,
+      sessionid: gameUUID,
+      round: round,
+      actor: pickedActor?.name || "",
+      feedback: feedback,
+    };
+    if (process.env.NODE_ENV === "development") {
+      console.log("Feedback payload:", payload);
+    } else {
+      postData("api/store/events", payload).catch((error) => {
+        console.error("Failed to send feedback:", error);
+      });
+    }
+  };
+
   // Timer countdown
   useEffect(() => {
     if (gamePhase === "playing" && timeLeft > 0) {
@@ -116,10 +165,37 @@ export default function GameUI({
     } else if (timeLeft === 0 && gamePhase === "playing") {
       if (round >= totalRound) {
         setGamePhase("gameEnd");
-        onGameEnd && onGameEnd();
+        sendAnalyticsEvent(tracker, "end_game", {
+          action: "end_game",
+          category: "engagement",
+          sessionid: gameUUID,
+        });
+        postData("api/store/events", {
+          event: "end_game",
+          sessionid: gameUUID,
+          score: score,
+        }).catch((error) => {
+          console.error("Failed to send game end event:", error);
+        });
       } else {
         setGamePhase("roundEnd");
         onRoundEnd && onRoundEnd();
+        const payload = {
+          event: "round_end",
+          sessionid: gameUUID,
+          round: round,
+          actor: pickedActor?.name || "",
+          score: score,
+          points: points,
+          answeredMovies: answeredMovies.length,
+        };
+        if (process.env.NODE_ENV === "development") {
+          console.log("Round end payload:", payload);
+        } else {
+          postData("api/store/events", payload).catch((error) => {
+            console.error("Failed to send round end event:", error);
+          });
+        }
       }
       setTimeLeft(20);
       setAnswer("");
@@ -147,9 +223,8 @@ export default function GameUI({
                     fullname={pickedActor?.name || ""}
                     imageUrl={pickedActor?.image || ""}
                   />
-
                   {answerStatus === "correct" && (
-                    <div className="mt-5">
+                    <div className="mt-2">
                       <Feedback
                         key={`feedback-correct-${Date.now()}`}
                         status="correct"
@@ -158,7 +233,7 @@ export default function GameUI({
                     </div>
                   )}
                   {answerStatus === "incorrect" && (
-                    <div className="mt-5">
+                    <div className="mt-2">
                       <Feedback
                         key={`feedback-incorrect-${Date.now()}`}
                         status="incorrect"
@@ -167,7 +242,7 @@ export default function GameUI({
                     </div>
                   )}
                   {answerStatus === "repeated" && (
-                    <div className="mt-5">
+                    <div className="mt-2">
                       <Feedback
                         key={`feedback-repeated-${Date.now()}`}
                         status="repeated"
@@ -177,7 +252,7 @@ export default function GameUI({
                   )}
                 </div>
                 {answeredMovies.length > 0 && (
-                  <div className="mt-2 text-left w-full">
+                  <div className="text-left w-full">
                     <p className="text-sm text-white/50 mb-1">Answered:</p>
                     <div className="flex flex-wrap gap-2">
                       {answeredMovies.map((movie, index) => (
@@ -194,7 +269,7 @@ export default function GameUI({
                 <div className="w-full max-w-md mx-auto flex items-center gap-2">
                   <Input
                     className="text-gray-950 bg-white w-full"
-                    placeholder="🎬 Type a movie title..."
+                    placeholder="Type a movie title..."
                     onKeyDown={handleInputKeyDown}
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}
@@ -210,6 +285,50 @@ export default function GameUI({
                       Submit
                     </Button>
                   </div>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <Button
+                    className="text-sm bg-blue-500/20 hover:bg-blue-500/30 cursor-default"
+                    onClick={() => {
+                      if (shuffle <= 0) return;
+                      setShuffle(shuffle - 1);
+                      onShuffleActor && onShuffleActor();
+                      setTimeLeft(30);
+                      setAnsweredMovies([]);
+                      setAnswerStatus(null);
+                      setAnswer("");
+                      sendAnalyticsEvent(tracker, "shuffle_actor", {
+                        action: "shuffle_actor",
+                        category: "engagement",
+                        label: `round_${round}`,
+                        actor: pickedActor?.name || "",
+                      });
+                    }}
+                  >
+                    <FaShuffle />
+                    <span>Shuffle</span>
+                    <div className="flex items-center justify-center bg-gray-500 rounded-xl w-4 h-4">
+                      {shuffle}
+                    </div>
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setTimeLeft(0);
+                      setAnswerStatus(null);
+                      setAnswer("");
+                      sendAnalyticsEvent(tracker, "skip_round", {
+                        action: "skip_round",
+                        category: "engagement",
+                        label: `round_${round}`,
+                        actor: pickedActor?.name || "",
+                        sessionid: gameUUID,
+                      });
+                    }}
+                    className="hover:bg-red-500/30"
+                  >
+                    <BsSkipForwardFill />
+                    <span>Skip</span>
+                  </Button>
                 </div>
                 <div className="w-full xl:max-w-xl px-10">
                   <Timer timeLeft={timeLeft} />
@@ -262,12 +381,27 @@ export default function GameUI({
                     <FaArrowRightLong />
                   </Button>
                 </div>
+                <div>
+                  <QuickFeedback
+                    onFeedback={(feeback) => trackFeedback(feeback)}
+                  />
+                </div>
               </div>
             )}
             {gamePhase === "gameEnd" && (
               <>
                 <div className="flex flex-col items-center gap-5 p-5 w-full overflow-y-scroll max-h-[70vh]">
-                  <GiveAFeedbackBanner />
+                  {showSurvey ? (
+                    <GiveAFeedbackBanner />
+                  ) : (
+                    <QuickFeedback
+                      message="Did you enjoy the game?"
+                      onFeedback={(feeback) => {
+                        trackFeedback(feeback, "game_feedback");
+                        setShowSurvey(true);
+                      }}
+                    />
+                  )}
                   <div className="text-4xl text-white font-bold">Game End!</div>
                   <div className="text-2xl text-white flex items-center gap-2">
                     Your score:
@@ -277,6 +411,7 @@ export default function GameUI({
                   </div>
                   <div className="mt-2 flex items-center justify-center">
                     <Button
+                      className="flex items-center gap-2 bg-yellow-300 text-gray-950 hover:bg-yellow-300 hover:text-white"
                       onClick={() => {
                         tracker.trackEvent("play_again", {
                           action: "play_again",

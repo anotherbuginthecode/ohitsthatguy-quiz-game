@@ -10,7 +10,6 @@ import { AnalyticsProvider } from "@keiko-app/react-google-analytics";
 import { useEffect, useState } from "react";
 
 import type { Route } from "./+types/root";
-import Header from "~/components/Header";
 import { Toaster } from "~/components/ui/sonner";
 import "./app.css";
 import cinemaBg from "./assets/cinema-bg.jpg";

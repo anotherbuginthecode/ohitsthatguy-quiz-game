@@ -1,12 +1,12 @@
 import { useState, useEffect, use } from "react";
 import GameUI from "../components/game-ui/gameUI";
 import { mockActorsENG, mockActorsITA } from "~/lib/mock";
-import { trackNewGame } from "~/lib/ga-utils";
 import { useParams, useLocation } from "react-router";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
 import { fetchData, postData } from "~/lib/api";
 import HowToPlay from "~/components/HowToPlay";
 import Header from "~/components/Header";
+import { sendAnalyticsEvent } from "~/lib/ga-tracker";
 
 // const LANGUAGES = [
 //   { code: "it", label: "Italiano", flag: "🇮🇹" },
@@ -53,40 +53,61 @@ export default function GamePlay() {
     };
   }
 
-  async function pickRandomActor() {
-    try {
+  const fetchActors = async () => {
+    if (process.env.NODE_ENV === "development") {
+      const mockData = mockActorsENG;
+      const shuffled = mockData.sort(() => 0.5 - Math.random());
+      const actors = shuffled.slice(0, rounds);
+      return actors;
+    } else {
       const res = await fetchData(`api/actors`);
       const data = res.data;
       const actors = data.map(transformActorPayload);
+      return actors;
+    }
+  };
+
+  async function pickRandomActor() {
+    if (process.env.NODE_ENV === "development") {
+      const mockData = mockActorsENG;
+      const shuffled = mockData.sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, rounds);
+      setActors(selected);
+      return;
+    }
+
+    try {
+      const actors = await fetchActors();
       setActors(actors);
     } catch (error) {
       console.error("Failed to fetch game settings:", error);
     }
   }
 
-  async function storeGameSession() {
-    try {
-      const res = await postData(`api/sessions?game_uuid=${gameId}`, {});
-      const data = res.data;
-      console.log("Game session stored:", data);
-    } catch (error) {
-      console.error("Failed to store game session:", error);
-    }
-  }
+  const handleShuffleActors = async () => {
+    const shuffledActors = await fetchActors();
+    const randomActor =
+      shuffledActors[Math.floor(Math.random() * shuffledActors.length)];
+    setActor(randomActor);
+  };
 
   function handleStart() {
+    sendAnalyticsEvent(tracker, "start_game", {
+      action: "start_game",
+      category: "engagement",
+      sessionid: gameId,
+    });
     setSteps("loading");
     pickRandomActor();
-    trackNewGame(tracker, "new_game", {
-      action: "new_game_started",
-      category: "engagement",
-      language: language,
-      rounds: rounds,
-      gameId: gameId,
-    });
   }
 
   function handleNextRound() {
+    sendAnalyticsEvent(tracker, "next_round", {
+      action: "next_round",
+      category: "engagement",
+      label: `round_${currentRound + 1}`,
+      sessionid: gameId,
+    });
     if (actors.length > 0) {
       setCurrentRound(currentRound + 1);
       const currentIndex = actors.findIndex((a) => a.id === actor?.id);
@@ -98,9 +119,14 @@ export default function GamePlay() {
   }
 
   function handlePlayAgain() {
+    sendAnalyticsEvent(tracker, "play_again", {
+      action: "play_again",
+      category: "engagement",
+      sessionid: gameId,
+    });
+    setSteps("loading");
     pickRandomActor();
     setCurrentRound(1);
-    storeGameSession();
   }
 
   useEffect(() => {
@@ -140,6 +166,7 @@ export default function GamePlay() {
               showHint={false}
               onNextRound={handleNextRound}
               onPlayAgain={handlePlayAgain}
+              onShuffleActor={handleShuffleActors}
             />
           )}
         </div>
