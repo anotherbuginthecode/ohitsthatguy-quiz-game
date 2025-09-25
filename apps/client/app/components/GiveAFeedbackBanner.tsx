@@ -17,7 +17,7 @@ export default function GiveAFeedbackBanner() {
         rel="noopener noreferrer"
         className="mt-2 inline-block bg-indigo-500 text-white px-3 py-1 rounded hover:bg-blue-700"
       >
-        Give Feedback
+        Take the Survey
       </a>
     </div>
   );

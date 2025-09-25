@@ -20,7 +20,7 @@ export default function Feedback({
   return (
     <div className="text-center">
       <div
-        className={`px-4 py-2 rounded shadow-md border ${
+        className={`px-4 rounded shadow-md border ${
           status === "correct"
             ? "text-green-500 border-green-500"
             : status === "incorrect"
