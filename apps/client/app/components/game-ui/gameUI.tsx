@@ -60,7 +60,7 @@ export default function GameUI({
   const [round, setRound] = useState(1);
   const [gamePhase, setGamePhase] = useState<
     "playing" | "roundEnd" | "gameEnd"
-  >("playing");
+  >("roundEnd");
   const [answeredMovies, setAnsweredMovies] = useState<string[]>([]);
   const [showSurvey, setShowSurvey] = useState(false);
 
@@ -398,7 +398,7 @@ export default function GameUI({
                     <FaArrowRightLong />
                   </Button>
                 </div>
-                <div>
+                <div className="flex justify-center">
                   <QuickFeedback
                     onFeedback={(feeback) => trackFeedback(feeback)}
                   />
