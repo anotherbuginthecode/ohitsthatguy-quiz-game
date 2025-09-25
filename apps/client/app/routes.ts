@@ -6,4 +6,8 @@ export default [
     path: "play/:gameId",
     file: "routes/gamePlay.tsx",
   },
+  {
+    path: "privacy-policy",
+    file: "routes/privacy-policy.tsx",
+  },
 ] satisfies RouteConfig;

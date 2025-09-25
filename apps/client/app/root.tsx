@@ -14,6 +14,7 @@ import Header from "~/components/Header";
 import { Toaster } from "~/components/ui/sonner";
 import "./app.css";
 import cinemaBg from "./assets/cinema-bg.jpg";
+import CookieBanner from "./components/CookieBanner";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -32,6 +33,13 @@ const analyticsConfig = {
   measurementId: import.meta.env.VITE_APP_GA4_MEASUREMENT_ID,
   debug: false,
   verbose: false,
+  urlTransformer: (url: string) => {
+    const UUIDV4_REGEX = new RegExp(
+      /[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/,
+      "g"
+    );
+    return url.replaceAll(UUIDV4_REGEX, "**MASKED**");
+  },
 };
 
 function ClientOnlyAnalyticsProvider({
@@ -79,6 +87,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
             }}
           >
             <main className="h-dvh">{children}</main>
+            <CookieBanner />
+
             <Toaster />
           </div>
           <ScrollRestoration />
