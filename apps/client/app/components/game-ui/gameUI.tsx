@@ -142,9 +142,11 @@ export default function GameUI({
     const payload = {
       event: event,
       sessionid: gameUUID,
-      round: round,
-      actor: pickedActor?.name || "",
-      feedback: feedback,
+      props: {
+        round: round,
+        actor: pickedActor?.name || "",
+        feedback: feedback,
+      },
     };
     if (process.env.NODE_ENV === "development") {
       console.log("Feedback payload:", payload);
@@ -173,7 +175,7 @@ export default function GameUI({
         postData("api/store/events", {
           event: "end_game",
           sessionid: gameUUID,
-          score: score,
+          props: { score: score },
         }).catch((error) => {
           console.error("Failed to send game end event:", error);
         });
@@ -183,11 +185,13 @@ export default function GameUI({
         const payload = {
           event: "round_end",
           sessionid: gameUUID,
-          round: round,
-          actor: pickedActor?.name || "",
-          score: score,
-          points: points,
-          answeredMovies: answeredMovies.length,
+          props: {
+            round: round,
+            actor: pickedActor?.name || "",
+            score: score,
+            points: points,
+            answeredMovies: answeredMovies.length,
+          },
         };
         if (process.env.NODE_ENV === "development") {
           console.log("Round end payload:", payload);
@@ -322,6 +326,19 @@ export default function GameUI({
                         label: `round_${round}`,
                         actor: pickedActor?.name || "",
                         sessionid: gameUUID,
+                      });
+                      postData("api/store/events", {
+                        event: "skip_round",
+                        sessionid: gameUUID,
+                        props: {
+                          round: round,
+                          actor: pickedActor?.name || "",
+                        },
+                      }).catch((error) => {
+                        console.error(
+                          "Failed to send skip round event:",
+                          error
+                        );
                       });
                     }}
                     className="hover:bg-red-500/30"

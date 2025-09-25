@@ -3,7 +3,7 @@ import GameUI from "../components/game-ui/gameUI";
 import { mockActorsENG, mockActorsITA } from "~/lib/mock";
 import { useParams, useLocation } from "react-router";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
-import { fetchData, postData } from "~/lib/api";
+import { fetchData } from "~/lib/api";
 import HowToPlay from "~/components/HowToPlay";
 import Header from "~/components/Header";
 import { sendAnalyticsEvent } from "~/lib/ga-tracker";
