@@ -8,6 +8,7 @@ import { useAnalytics } from "@keiko-app/react-google-analytics";
 import { useLocation } from "react-router";
 import { FaGamepad } from "react-icons/fa";
 import Logo from "~/assets/logo.png";
+import { trackRetention, sendAnalyticsEvent } from "~/lib/ga-tracker";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -28,6 +29,11 @@ export default function Home() {
 
   useEffect(() => {
     tracker.trackPageView({});
+    trackRetention(tracker);
+    sendAnalyticsEvent(tracker, "session_start", {
+      action: "land_home",
+      category: "engagement",
+    });
   }, [location, tracker]);
 
   return (
@@ -50,7 +56,7 @@ export default function Home() {
             to={`/play/${uuid}`}
             className="flex justify-center items-center gap-2 text-lg"
             onClick={() => {
-              tracker.trackEvent("new_game", {
+              sendAnalyticsEvent(tracker, "new_game", {
                 action: "new_game",
                 category: "engagement",
               });
