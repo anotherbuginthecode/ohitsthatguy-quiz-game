@@ -60,7 +60,7 @@ export default function GameUI({
   const [round, setRound] = useState(1);
   const [gamePhase, setGamePhase] = useState<
     "playing" | "roundEnd" | "gameEnd"
-  >("roundEnd");
+  >("playing");
   const [answeredMovies, setAnsweredMovies] = useState<string[]>([]);
   const [showSurvey, setShowSurvey] = useState(false);
 
