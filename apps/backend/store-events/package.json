@@ -1,5 +1,5 @@
 {
-  "name": "store-sessions",
+  "name": "store-events",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -19,6 +19,7 @@
   "dependencies": {
     "dotenv": "^17.2.2",
     "mongodb": "^6.20.0",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "zod": "^4.1.11"
   }
 }
