@@ -43,9 +43,9 @@ export default function HowToPlay({ onStart }: { onStart: () => void }) {
   ];
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-gray-900/10 rounded-xl backdrop-blur-xl shadow-lg border-none px-5">
+    <Card className="w-full max-w-md mx-auto bg-gray-900/10 rounded-xl backdrop-blur-xl shadow-lg border-none px-5 text-xs">
       <CardHeader className="pb-2">
-        <CardTitle className="font-baloo-bold text-2xl text-white text-center">
+        <CardTitle className="font-baloo-bold  text-white text-center">
           How to Play
         </CardTitle>
         <CardDescription className="text-muted-foreground text-center text-base">
@@ -58,7 +58,7 @@ export default function HowToPlay({ onStart }: { onStart: () => void }) {
             className="flex items-center gap-3 bg-background rounded-lg p-3 shadow-sm"
             key={index}
           >
-            <span className="text-2xl">{item.icon}</span>
+            <span className="">{item.icon}</span>
             <div>
               <span className="font-baloo-bold text-md text-foreground flex gap-2">
                 {item.title}{" "}

@@ -141,10 +141,9 @@ export default function GamePlay() {
   }, [actors]);
 
   return (
-    <div>
+    <div className="overflow-scroll min-h-screen h-5/6">
       <Header />
-
-      <div className="flex min-h-screen flex-col items-center gap-10 px-5 justify-center">
+      <div className="flex min-h-screen flex-col items-center px-5">
         <div className="w-full max-w-2xl">
           {steps === "instructions" && (
             <HowToPlay onStart={() => handleStart()} />
