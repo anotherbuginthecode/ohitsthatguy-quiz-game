@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import HowItWorks from "~/components/HowItWorks";
 import type { Route } from "./+types/home";
 import { Button } from "~/components/ui/button";
 import { Link } from "react-router";
-import { v4 as uuidv4 } from "uuid";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
 import { useLocation } from "react-router";
 import { FaGamepad } from "react-icons/fa";
 import Logo from "~/assets/logo.png";
 import { trackRetention, sendAnalyticsEvent } from "~/lib/ga-tracker";
+import HowToPlayDialog from "~/components/HowToPlayDialog";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import Navbar from "~/components/Navbar";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -25,6 +26,7 @@ export default function Home() {
   const location = useLocation();
   const { tracker } = useAnalytics();
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     tracker.trackPageView({});
@@ -51,14 +53,11 @@ export default function Home() {
         </h1>
         <p className="font-baloo text-xl">Guess fast, climb the score!</p>
       </div>
-      {/* <div className="w-full flex justify-center">
-        <HowItWorks />
-      </div> */}
-      <div className="flex justify-center w-full">
+      <div className="flex justify-center w-full gap-4 ">
         <Button className="cursor-pointer bg-yellow-300 text-gray-950 hover:bg-yellow-300 hover:text-white w-fit">
           <Link
             to={`/play/${sessionId}`}
-            className="flex justify-center items-center gap-2 text-lg"
+            className="flex justify-center items-center gap-2"
             onClick={() => {
               sendAnalyticsEvent(tracker, "new_game", {
                 action: "new_game",
@@ -70,7 +69,15 @@ export default function Home() {
             New Game <FaGamepad />
           </Link>
         </Button>
+        <Button
+          onClick={() => setOpen(true)}
+          className="text-white hover:bg-yellow-300 hover:text-gray-950 w-fit cursor-pointer"
+        >
+          How to Play <IoDocumentTextOutline size={20} />
+        </Button>
       </div>
+      {/* Dialog */}
+      <HowToPlayDialog open={open} onOpenChange={setOpen} />
     </div>
   );
 }

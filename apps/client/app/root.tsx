@@ -80,7 +80,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <ClientOnlyAnalyticsProvider>
           <div
-            className="bg-background bg-cover bg-center bg-fixed font-baloo h-dvh overflow-y-hidden"
+            className="bg-background bg-cover bg-center bg-fixed font-baloo h-dvh max-sm:overflow-y-scroll md:overflow-hidden"
             style={{
               backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.8)), url(${cinemaBg})`,
             }}
