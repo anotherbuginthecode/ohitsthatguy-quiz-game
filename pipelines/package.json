@@ -1,0 +1,22 @@
+{
+  "name": "ohitsthatguy-quiz-game",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "collection:actors": "ts-node -r tsconfig-paths/register src/infra/db/collections/actors.collection.ts",
+    "collection:rounds": "ts-node -r tsconfig-paths/register  src/infra/db/collections/rounds.collection.ts",
+    "collection:leaderboards": "ts-node -r tsconfig-paths/register  src/infra/db/collections/leaderboards.collection.ts",
+    "seed:rounds": "ts-node -r tsconfig-paths/register src/scripts/seeds/rounds.seed.ts"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "mongodb": "^6.20.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "tsconfig-paths": "^4.2.0"
+  },
+  "author": "",
+  "license": "ISC"
+}

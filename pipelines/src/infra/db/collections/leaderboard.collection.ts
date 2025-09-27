@@ -1,4 +1,4 @@
-import { getMongoClient } from "./db";
+import { getMongoClient } from "@/infra/db/client";
 
 async function createLeaderboardCollection() {
   const client = await getMongoClient();
