@@ -1,8 +1,8 @@
-import { connectDB, client } from "./db";
+import { getMongoClient } from "./db";
 
 async function createLeaderboardCollection() {
-  const db = await connectDB();
-
+  const client = await getMongoClient();
+  const db = client.db(process.env.MONGODB_DB_NAME);
   const collectionName = "leaderboard";
 
   // 1. Se non esiste già, creala con validator JSON Schema
@@ -47,5 +47,4 @@ async function createLeaderboardCollection() {
 
 createLeaderboardCollection().catch((err) => {
   console.error("Error creating collection:", err);
-  client.close();
 });

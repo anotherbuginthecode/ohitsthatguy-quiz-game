@@ -1,16 +1,15 @@
+import "dotenv/config";
+
 import { MongoClient } from "mongodb";
-import * as dotenv from "dotenv";
+let client: MongoClient | null = null;
 
-dotenv.config();
-
-const uri = process.env.MONGODB_URI || "";
-if (!uri) throw new Error("MONGODB_URI not defined");
-
-export const client = new MongoClient(uri);
-
-export async function connectDB() {
-  if (!client.topology?.isConnected()) {
+export async function getMongoClient(): Promise<MongoClient> {
+  if (!client) {
+    console.log("🔌 Connecting to MongoDB Atlas...");
+    const uri = (process.env.MONGODB_URI || "").trim();
+    client = new MongoClient(uri);
     await client.connect();
+    console.log("✅ Connected to MongoDB Atlas");
   }
-  return client.db(process.env.DB_NAME || "ohitsthatguy");
+  return client;
 }
