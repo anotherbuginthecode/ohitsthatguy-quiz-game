@@ -49,9 +49,11 @@ resource "aws_apigatewayv2_api" "api" {
     allow_methods     = [
       "GET",
       "OPTIONS",
+      "POST",
     ]
     allow_origins     = [
       "https://ohitsthatguy.xyz",
+      "http://localhost:5173",
     ]
     expose_headers    = []
     max_age           = 0
@@ -64,4 +66,10 @@ resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.api.id
   name        = "$default"
   auto_deploy = true
+}
+
+
+output "apigateway_endpoint" {
+  value = aws_apigatewayv2_stage.default.invoke_url
+  description = "The endpoint URL of the API Gateway"
 }
