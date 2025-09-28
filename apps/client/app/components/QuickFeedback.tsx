@@ -23,7 +23,7 @@ export default function QuickFeedback({
     "rounded-lg p-3 text-lg leading-none flex items-center justify-center focus:outline-none";
 
   return (
-    <div className="p-4 max-w-xs text-center text-white">
+    <div className="p-4 max-w-md text-center text-white">
       <h3>{message}</h3>
       <div className="mt-2 flex justify-center gap-4">
         {feedbackGiven === null ? (
