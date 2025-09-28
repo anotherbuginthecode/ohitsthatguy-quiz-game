@@ -53,7 +53,7 @@ export default function Playing({
         </div>
         <div>
           <h2 className="text-sm font-bold text-center text-white mt-4">
-            In Which Movie Did He Play This Actor?
+            In Which Movie Did This Actor Star?
           </h2>
           <div className="grid grid-cols-1 gap-3 mt-4">
             {round.choices.map((choice, index) => {
