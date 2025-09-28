@@ -5,18 +5,23 @@ import { useParams, useLocation } from "react-router";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
 import { fetchData, postData } from "~/lib/api";
 import { sendAnalyticsEvent } from "~/lib/ga-tracker";
+import type { Round } from "~/types/round.types";
 
 export default function GamePlay() {
   const location = useLocation();
   const { tracker } = useAnalytics();
   const { gameId } = useParams();
   const [fetchedRounds, setFetchedRounds] = useState([]);
+  const [secondChanceRound, setSecondChanceRound] = useState<Round | null>(
+    null
+  );
 
   const fetchRounds = async () => {
     try {
       const res = await fetchData(`api/rounds`);
       const data = res.data;
-      setFetchedRounds(data);
+      setFetchedRounds(data.rounds);
+      setSecondChanceRound(data.second_chance);
     } catch (error) {
       console.error("Failed to fetch game settings:", error);
     }
@@ -69,6 +74,7 @@ export default function GamePlay() {
             <GameUISingleChoice
               key={Date.now()} // force remount on play again using timestamp
               fetchedRounds={fetchedRounds}
+              secondChanceRound={secondChanceRound}
               onPlayAgain={() => handlePlayAgain()}
               gameUUID={gameId}
             />

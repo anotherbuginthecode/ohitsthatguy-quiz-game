@@ -104,7 +104,7 @@ function ScoreTab({
         <div className="w-full flex flex-col items-center">
           <QuickFeedback
             message="Did you enjoy the game?"
-            onFeedback={trackFeedback}
+            onFeedback={(feeback) => trackFeedback(feeback, "game_feedback")}
           />
           {showSurvey && <GiveAFeedbackBanner />}
         </div>
@@ -131,7 +131,7 @@ function LeaderboardTab() {
               }
               postData("api/store/events", {
                 event: "leaderboard_feedback",
-                sessionId: localStorage.getItem("sessionId") || "unknown",
+                sessionid: localStorage.getItem("sessionid") || "unknown",
                 props: {
                   feedback: feeback,
                   timestamp: new Date().toISOString(),
@@ -170,7 +170,7 @@ function SocialTab() {
               postData("api/store/events", {
                 event: "social_sharing_feedback",
                 props: {
-                  sessionId: localStorage.getItem("sessionId") || "unknown",
+                  sessionid: localStorage.getItem("sessionid") || "unknown",
                   feeback: feeback,
                   timestamp: new Date().toISOString(),
                 },

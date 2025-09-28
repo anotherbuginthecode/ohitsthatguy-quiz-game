@@ -25,14 +25,14 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   const location = useLocation();
   const { tracker } = useAnalytics();
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionid, setSessionid] = useState<string | null>(null);
   const [deviceId, setDeviceId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     tracker.trackPageView({});
     const { anonymousId, deviceUUID } = trackRetention(tracker);
-    setSessionId(anonymousId);
+    setSessionid(anonymousId);
     setDeviceId(deviceUUID);
     sendAnalyticsEvent(tracker, "session_start", {
       action: "land_home",
@@ -59,13 +59,14 @@ export default function Home() {
       <div className="flex justify-center w-full gap-4 ">
         <Button className="cursor-pointer bg-yellow-300 text-gray-950 hover:bg-yellow-300 hover:text-white w-fit">
           <Link
-            to={`/play/${sessionId}`}
+            to={`/play/${sessionid}`}
             className="flex justify-center items-center gap-2"
             onClick={() => {
               sendAnalyticsEvent(tracker, "new_game", {
                 action: "new_game",
                 category: "engagement",
-                sessionid: sessionId,
+                label: "user started a new game",
+                sessionid: sessionid,
                 deviceid: deviceId,
               });
             }}
@@ -74,7 +75,16 @@ export default function Home() {
           </Link>
         </Button>
         <Button
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setOpen(true);
+            sendAnalyticsEvent(tracker, "how_to_play", {
+              action: "how_to_play",
+              category: "engagement",
+              label: "user opened how to play dialog",
+              sessionid: sessionid,
+              deviceid: deviceId,
+            });
+          }}
           className="text-white hover:bg-yellow-300 hover:text-gray-950 w-fit cursor-pointer"
         >
           How to Play <IoDocumentTextOutline size={20} />

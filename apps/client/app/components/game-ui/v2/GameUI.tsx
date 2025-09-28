@@ -8,21 +8,28 @@ import { BsSkipForwardFill } from "react-icons/bs";
 import GameEnd from "./GameEnd";
 import type { Round } from "~/types/round.types";
 import type { PickedAnswer } from "~/types/answer.types";
+import { Badge } from "~/components/ui/badge";
+import { sendAnalyticsEvent } from "~/lib/ga-tracker";
+import { useAnalytics } from "@keiko-app/react-google-analytics";
 
 export type GamePhase = "playing" | "roundEnd" | "gameEnd";
 
 export default function GameUISingleChoice({
   fetchedRounds,
+  secondChanceRound,
   gameUUID,
   onPlayAgain,
 }: {
   fetchedRounds?: Round[];
+  secondChanceRound?: Round | null;
   gameUUID?: string;
   onPlayAgain: () => void;
 }) {
+  const { tracker } = useAnalytics();
   const totalRounds = 5;
   const basePoints = 100;
   const totalTime = 60;
+  const [secondChanceCounter, setSecondChanceCounter] = useState(1);
   const [currentRound, setCurrentRound] = useState(1);
   const [currentActor, setCurrentActor] = useState(
     fetchedRounds ? fetchedRounds[0] : mockRounds[0]
@@ -64,15 +71,20 @@ export default function GameUISingleChoice({
   };
 
   const handleSkip = () => {
-    setTimeLeft((prev) => Math.max(prev - 5, 0));
+    if (secondChanceCounter <= 0) return;
     if (currentRound < totalRounds) {
-      setCurrentRound(currentRound + 1);
+      sendAnalyticsEvent(tracker, "second_chance_used", {
+        action: "second_chance_used",
+        category: "engagement",
+        label: "user used second chance",
+        sessionid: localStorage.getItem("anonymousId") || "unknown",
+        deviceuuid: localStorage.getItem("anonymous_device") || "unknown",
+      });
+      setTimeLeft((prev) => Math.max(prev - 10, 0));
+      setSecondChanceCounter((prev) => Math.max(prev - 1, 0));
       setCurrentActor(
-        fetchedRounds ? fetchedRounds[currentRound] : mockRounds[currentRound]
+        secondChanceRound ? secondChanceRound : mockRounds[currentRound]
       );
-      setGamePhase("roundEnd");
-    } else {
-      setGamePhase("gameEnd");
     }
     if (timeLeft <= 5) {
       setTimeLeft(0);
@@ -83,6 +95,14 @@ export default function GameUISingleChoice({
 
   const handleNext = () => {
     if (currentRound < totalRounds) {
+      sendAnalyticsEvent(tracker, "next_round", {
+        action: "next_round",
+        category: "engagement",
+        label: "user proceeded to next round",
+        sessionid: localStorage.getItem("anonymousId") || "unknown",
+        deviceuuid: localStorage.getItem("anonymous_device") || "unknown",
+      });
+
       setCurrentRound(currentRound + 1);
       setCurrentActor(
         fetchedRounds ? fetchedRounds[currentRound] : mockRounds[currentRound]
@@ -134,11 +154,15 @@ export default function GameUISingleChoice({
           <div className="container px-2 flex items-center w-full justify-center">
             {gamePhase === "playing" && (
               <Button
-                className="bg-yellow-300 hover:bg-yellow-700 text-gray-950 w-2/3"
+                className="text-white hover:bg-yellow-700 w-fit border border-yellow-300"
                 onClick={handleSkip}
               >
-                <BsSkipForwardFill className="mr-2" />
-                <span>Skip (-5s)</span>
+                <span>
+                  ⚡ Second Chance (-10s)
+                  <Badge className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums bg-white text-gray-950 ml-2">
+                    {secondChanceCounter}
+                  </Badge>
+                </span>
               </Button>
             )}
             {gamePhase === "roundEnd" && (

@@ -3,6 +3,8 @@ import { Card, CardContent } from "~/components/ui/card";
 import ActorImage from "../actorImage";
 import Option from "./Options";
 import type { Round } from "~/types/round.types";
+import { sendAnalyticsEvent } from "~/lib/ga-tracker";
+import { useAnalytics } from "@keiko-app/react-google-analytics";
 
 export default function Playing({
   round,
@@ -13,9 +15,17 @@ export default function Playing({
   score: number;
   onAnswer: (isCorrect: boolean) => void;
 }) {
+  const { tracker } = useAnalytics();
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
 
   const onSelectOption = (title: string) => {
+    sendAnalyticsEvent(tracker, "answer_selected", {
+      action: "answer_selected",
+      category: "engagement",
+      label: title,
+      sessionid: localStorage.getItem("anonymousId") || "unknown",
+      deviceuuid: localStorage.getItem("anonymous_device") || "unknown",
+    });
     setSelectedTitle(title);
     const isCorrect =
       round.choices.find((c) => c.name === title)?.id === round.correctId;
