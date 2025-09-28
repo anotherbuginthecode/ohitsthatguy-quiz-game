@@ -26,19 +26,22 @@ export default function Home() {
   const location = useLocation();
   const { tracker } = useAnalytics();
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [deviceId, setDeviceId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     tracker.trackPageView({});
-    const currentSessionUUID = trackRetention(tracker);
-    setSessionId(currentSessionUUID);
+    const { anonymousId, deviceUUID } = trackRetention(tracker);
+    setSessionId(anonymousId);
+    setDeviceId(deviceUUID);
     sendAnalyticsEvent(tracker, "session_start", {
       action: "land_home",
       category: "engagement",
       sessionid:
         process.env.NODE_ENV === "development"
           ? "11111111-1111-1111-1111-111111111111"
-          : currentSessionUUID,
+          : anonymousId,
+      deviceid: deviceUUID,
     });
   }, [location, tracker]);
 
@@ -63,6 +66,7 @@ export default function Home() {
                 action: "new_game",
                 category: "engagement",
                 sessionid: sessionId,
+                deviceid: deviceId,
               });
             }}
           >

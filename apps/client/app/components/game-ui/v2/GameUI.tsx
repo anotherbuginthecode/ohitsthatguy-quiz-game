@@ -22,7 +22,7 @@ export default function GameUISingleChoice({
 }) {
   const totalRounds = 5;
   const basePoints = 100;
-  const totalTime = 90;
+  const totalTime = 60;
   const [currentRound, setCurrentRound] = useState(1);
   const [currentActor, setCurrentActor] = useState(
     fetchedRounds ? fetchedRounds[0] : mockRounds[0]
