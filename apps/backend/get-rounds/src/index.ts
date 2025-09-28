@@ -14,8 +14,6 @@ export const handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
   const method = event.requestContext?.http?.method;
 
-  console.log(method, event);
-
   if (method !== "GET") {
     return {
       statusCode: 405,
@@ -48,7 +46,7 @@ export const handler = async (
   const collection = db.collection("rounds");
 
   const rounds = await collection
-    .aggregate([{ $sample: { size: 5 } }])
+    .aggregate([{ $sample: { size: 6 } }]) // 5 random rounds + 1 extra for second chance functionality
     .toArray();
 
   return {
@@ -60,7 +58,10 @@ export const handler = async (
     },
     body: JSON.stringify({
       status: "success",
-      data: rounds as Round[],
+      data: {
+        rounds: rounds.slice(0, 5) as RoundDocument[],
+        second_chance: rounds[5] as RoundDocument,
+      },
     }),
   };
 };

@@ -7,6 +7,7 @@ import {
   DialogFooter,
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
 
 interface HowToPlayDialogProps {
   open: boolean;
@@ -34,10 +35,12 @@ export default function HowToPlayDialog({
             🎬 Standard Mode (Multiple Choice)
           </h3>
           <ul className="space-y-1 max-sm:text-sm text-md">
-            <li>⏱ 90 seconds total for all 5 rounds.</li>
+            <li>⏱ 60 seconds total for all 5 rounds.</li>
             <li>🎭 Each round: 3 titles, only 1 correct.</li>
             <li>❌ Wrong = no points.</li>
-            <li>🔄 Skip a round (costs 5 seconds).</li>
+            <li>
+              ⚡ Second Chance: swap the actor once per game (−10s penalty)
+            </li>
           </ul>
 
           <div className="mt-5">
@@ -62,7 +65,7 @@ export default function HowToPlayDialog({
         {/* Express Mode */}
         <section className="mt-6 space-y-2">
           <h3 className="flex items-center gap-2 text-lg font-semibold">
-            ⚡ Express Mode (Unlockable)
+            ⚡ Express Mode (Unlockable) <Badge>WIP</Badge>
           </h3>
           <ul className="space-y-1 max-sm:text-sm text-md">
             <li>🔓 Unlock: get a perfect 5/5 in Standard Mode.</li>
