@@ -15,7 +15,11 @@ export function initUser() {
     localStorage.setItem("installDate", installDate);
   }
 
-  return { anonymousId, installDate: new Date(installDate as string) };
+  return {
+    anonymousId,
+    installDate: new Date(installDate as string),
+    deviceUUID: localStorage.getItem("anonymous_device"),
+  };
 }
 
 // Calcola differenza giorni
@@ -28,7 +32,7 @@ function daysBetween(date1: Date, date2: Date) {
 const retentionDays = [1, 3, 7, 14];
 
 export function trackRetention(tracker: GoogleAnalyticsTracker) {
-  const { anonymousId, installDate } = initUser();
+  const { anonymousId, installDate, deviceUUID } = initUser();
   const today = new Date();
   const daysSince = daysBetween(installDate, today);
 
@@ -36,7 +40,7 @@ export function trackRetention(tracker: GoogleAnalyticsTracker) {
     sendAnalyticsEvent(tracker, `retention_d${daysSince}`, { anonymousId });
   }
 
-  return anonymousId;
+  return { anonymousId, deviceUUID };
 }
 
 // Mock invio evento a GA4
