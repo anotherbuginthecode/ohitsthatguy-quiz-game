@@ -2,28 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "~/components/ui/card";
 import ActorImage from "../actorImage";
 import Option from "./Options";
-
-type Round = {
-  actor: {
-    tmdb_id: number;
-    name: string;
-    image: string;
-  };
-  correctId: number;
-  choices: {
-    id: number;
-    name: string;
-    original_language: string;
-    medium: string;
-    year: number;
-    genres: number[];
-    popularity: number;
-  }[];
-  meta: {
-    totalTime: number;
-    mode: string;
-  };
-};
+import type { Round } from "~/types/round.types";
 
 export default function Playing({
   round,
@@ -58,13 +37,13 @@ export default function Playing({
         </div>
         <div className="flex flex-col items-center space-y-4">
           <ActorImage
-            imageUrl={`https://image.tmdb.org/t/p/w500${round.actor.image}`}
+            imageUrl={round.actor.image}
             fullname={round.actor.name}
           />
         </div>
         <div>
           <h2 className="text-sm font-bold text-center text-white mt-4">
-            In Which Movie Did He Play This Character?
+            In Which Movie Did He Play This Actor?
           </h2>
           <div className="grid grid-cols-1 gap-3 mt-4">
             {round.choices.map((choice, index) => {

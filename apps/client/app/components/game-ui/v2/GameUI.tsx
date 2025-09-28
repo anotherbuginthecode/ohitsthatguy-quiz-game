@@ -6,22 +6,27 @@ import { calculatePoints } from "~/lib/score-calculator";
 import { mockRounds } from "~/lib/mock";
 import { BsSkipForwardFill } from "react-icons/bs";
 import GameEnd from "./GameEnd";
+import type { Round } from "~/types/round.types";
+import type { PickedAnswer } from "~/types/answer.types";
 
 export type GamePhase = "playing" | "roundEnd" | "gameEnd";
-export type PickedAnswer = {
-  tmdb_id: number;
-  name: string;
-  image: string;
-  correct: boolean;
-  mode: "standard" | "express";
-};
 
-export default function GameUISingleChoice() {
+export default function GameUISingleChoice({
+  fetchedRounds,
+  gameUUID,
+  onPlayAgain,
+}: {
+  fetchedRounds?: Round[];
+  gameUUID?: string;
+  onPlayAgain: () => void;
+}) {
   const totalRounds = 5;
   const basePoints = 100;
   const totalTime = 90;
   const [currentRound, setCurrentRound] = useState(1);
-  const [currentActor, setCurrentActor] = useState(mockRounds[0]);
+  const [currentActor, setCurrentActor] = useState(
+    fetchedRounds ? fetchedRounds[0] : mockRounds[0]
+  );
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [score, setScore] = useState(0);
   const [currentStreak, setCurrentStreak] = useState(0);
@@ -62,7 +67,9 @@ export default function GameUISingleChoice() {
     setTimeLeft((prev) => Math.max(prev - 5, 0));
     if (currentRound < totalRounds) {
       setCurrentRound(currentRound + 1);
-      setCurrentActor(mockRounds[currentRound]); // assuming mockRounds is 0-indexed
+      setCurrentActor(
+        fetchedRounds ? fetchedRounds[currentRound] : mockRounds[currentRound]
+      );
       setGamePhase("roundEnd");
     } else {
       setGamePhase("gameEnd");
@@ -77,7 +84,9 @@ export default function GameUISingleChoice() {
   const handleNext = () => {
     if (currentRound < totalRounds) {
       setCurrentRound(currentRound + 1);
-      setCurrentActor(mockRounds[currentRound]);
+      setCurrentActor(
+        fetchedRounds ? fetchedRounds[currentRound] : mockRounds[currentRound]
+      );
       setGamePhase("playing");
     } else {
       setGamePhase("gameEnd");
@@ -113,7 +122,12 @@ export default function GameUISingleChoice() {
             />
           )}
           {gamePhase === "gameEnd" && (
-            <GameEnd pickedAnswer={pickedAnswer} score={score} />
+            <GameEnd
+              gameUUID={gameUUID}
+              pickedAnswer={pickedAnswer}
+              score={score}
+              onPlayAgain={onPlayAgain}
+            />
           )}
         </div>
         {gamePhase !== "gameEnd" && (
