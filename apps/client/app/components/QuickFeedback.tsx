@@ -12,7 +12,7 @@ export default function QuickFeedback({
 
   const handleFeedback = (feedback: "yes" | "no") => {
     toast.success(
-      `Thanks for your feedback: ${feedback === "yes" ? "👍 Yes" : "👎 No"}`,
+      `Thanks for your feedback: ${feedback === "yes" ? "😊" : "😢"}`,
       { position: "top-center" }
     );
     onFeedback(feedback);
