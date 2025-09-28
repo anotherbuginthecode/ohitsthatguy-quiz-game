@@ -20,7 +20,7 @@ export default function QuickFeedback({
   };
 
   const baseBtn =
-    "rounded-lg p-3 text-3xl leading-none flex items-center justify-center focus:outline-none active:scale-95 transition";
+    "rounded-lg p-3 text-lg leading-none flex items-center justify-center focus:outline-none";
 
   return (
     <div className="p-4 max-w-xs text-center text-white">
