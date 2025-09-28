@@ -5,14 +5,24 @@ import Option from "./Options";
 
 type Round = {
   actor: {
-    id: number;
+    tmdb_id: number;
     name: string;
     image: string;
   };
+  correctId: number;
   choices: {
-    title: string;
-    isCorrect: boolean;
+    id: number;
+    name: string;
+    original_language: string;
+    medium: string;
+    year: number;
+    genres: number[];
+    popularity: number;
   }[];
+  meta: {
+    totalTime: number;
+    mode: string;
+  };
 };
 
 export default function Playing({
@@ -28,9 +38,9 @@ export default function Playing({
 
   const onSelectOption = (title: string) => {
     setSelectedTitle(title);
-    onAnswer(
-      round.choices.find((choice) => choice.title === title)?.isCorrect || false
-    );
+    const isCorrect =
+      round.choices.find((c) => c.name === title)?.id === round.correctId;
+    onAnswer(isCorrect);
   };
 
   const showCorrect = selectedTitle !== null;
@@ -48,7 +58,7 @@ export default function Playing({
         </div>
         <div className="flex flex-col items-center space-y-4">
           <ActorImage
-            imageUrl={round.actor.image}
+            imageUrl={`https://image.tmdb.org/t/p/w500${round.actor.image}`}
             fullname={round.actor.name}
           />
         </div>
@@ -58,14 +68,14 @@ export default function Playing({
           </h2>
           <div className="grid grid-cols-1 gap-3 mt-4">
             {round.choices.map((choice, index) => {
-              const isSelected = selectedTitle === choice.title;
+              const isSelected = selectedTitle === choice.name;
               // Show correct if selected, otherwise only show selected
-              const isCorrect = showCorrect && choice.isCorrect;
+              const isCorrect = showCorrect && choice.id === round.correctId;
               return (
                 <Option
                   key={index}
-                  value={choice.title}
-                  onSelect={() => onSelectOption(choice.title)}
+                  value={choice.name}
+                  onSelect={() => onSelectOption(choice.name)}
                   isCorrect={isCorrect}
                   isSelected={isSelected}
                 />

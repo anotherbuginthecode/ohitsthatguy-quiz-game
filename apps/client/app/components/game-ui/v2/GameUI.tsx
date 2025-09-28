@@ -9,10 +9,11 @@ import GameEnd from "./GameEnd";
 
 export type GamePhase = "playing" | "roundEnd" | "gameEnd";
 export type PickedAnswer = {
-  id: number;
+  tmdb_id: number;
   name: string;
   image: string;
   correct: boolean;
+  mode: "standard" | "express";
 };
 
 export default function GameUISingleChoice() {
@@ -31,10 +32,11 @@ export default function GameUISingleChoice() {
     setPickedAnswer([
       ...pickedAnswer,
       {
-        id: currentActor.actor.id,
+        tmdb_id: currentActor.actor.tmdb_id,
         name: currentActor.actor.name,
         image: currentActor.actor.image,
         correct: isCorrect,
+        mode: "standard",
       },
     ]);
     // Here you can also send the answer to your backend or analytics service
