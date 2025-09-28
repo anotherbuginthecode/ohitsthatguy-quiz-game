@@ -71,7 +71,7 @@ export default function HowToPlayDialog({
             <li>
               🏆 Scoring: +200 per correct title, with speed & streak bonuses.
             </li>
-            <li>❌ Mistakes = no points and cost time (-5s).</li>
+            <li>❌ Mistakes = no points and cost time (-2s).</li>
           </ul>
         </section>
 
