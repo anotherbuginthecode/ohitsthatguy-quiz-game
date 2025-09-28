@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import QuickFeedback from "~/components/QuickFeedback";
+import { Button } from "~/components/ui/button";
 
 export type PickedAnswer = {
-  id: number;
+  tmdb_id: number;
   name: string;
   image: string;
   correct: boolean;
@@ -30,9 +32,11 @@ export default function GameEnd({
           <div className="text-center text-white mb-2">Your Rounds</div>
           <div className="flex gap-3">
             {pickedAnswer.map((actor) => (
-              <div className="relative" key={actor.id}>
+              <div className="relative" key={actor.tmdb_id}>
                 <Avatar className="w-10 h-10">
-                  <AvatarImage src={actor.image} />
+                  <AvatarImage
+                    src={`https://image.tmdb.org/t/p/w500${actor.image}`}
+                  />
                   <AvatarFallback>{actor.name}</AvatarFallback>
                 </Avatar>
                 <div
@@ -44,8 +48,20 @@ export default function GameEnd({
             ))}
           </div>
         </div>
-        <div className="text-center text-white">
+        {/* <div className="text-center text-white">
           Thanks for playing! Share your score and challenge your friends!
+        </div> */}
+        <div className="flex flex-col items-center gap-3 text-center text-md text-white mt-4">
+          <p>Your memory vs the clock… ready for revenge?</p>
+          <Button>🔥 Beat Your Score! 🔥</Button>
+        </div>
+        <div>
+          <QuickFeedback
+            message="Did you enjoy the game?"
+            onFeedback={(feedback) => {
+              console.log("User feedback:", feedback);
+            }}
+          />
         </div>
         {/* <div className="flex flex-col md:flex-row gap-3 w-full justify-center">
           <Option label="Share on Twitter" bgColor="bg-blue-500 hover:bg-blue-600" />
