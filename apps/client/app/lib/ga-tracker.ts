@@ -11,6 +11,7 @@ export function initUser() {
     anonymousId = uuidv4();
     installDate = new Date().toISOString();
     localStorage.setItem("anonymousId", anonymousId);
+    localStorage.setItem("anonymous_device", "device_" + anonymousId);
     localStorage.setItem("installDate", installDate);
   }
 
