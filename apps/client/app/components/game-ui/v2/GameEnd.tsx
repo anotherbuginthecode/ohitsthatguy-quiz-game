@@ -102,11 +102,13 @@ function ScoreTab({
           </Button>
         </div>
         <div className="w-full flex flex-col items-center">
-          <QuickFeedback
+          {/* <QuickFeedback
             message="Did you enjoy the game?"
             onFeedback={(feeback) => trackFeedback(feeback, "game_feedback")}
           />
-          {showSurvey && <GiveAFeedbackBanner />}
+          {showSurvey && <GiveAFeedbackBanner />} */}
+
+          <GiveAFeedbackBanner />
         </div>
       </CardContent>
     </Card>
