@@ -7,6 +7,12 @@ export type Title = {
   year?: number;
   genres: number[];
   popularity: number;
+  posterUrl?: string;
 };
 
-export type Actor = { tmdb_id: number; name: string; image: string };
+export type Actor = {
+  tmdb_id: number;
+  name: string;
+  image: string | undefined;
+  popularity: number;
+};
