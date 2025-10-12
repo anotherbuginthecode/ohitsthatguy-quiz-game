@@ -51,9 +51,12 @@ resource "aws_apigatewayv2_api" "api" {
       "OPTIONS",
       "POST",
     ]
+    # allow_origins     = [
+    #   "https://ohitsthatguy.xyz",
+    #   "http://localhost:5173",
+    # ]
     allow_origins     = [
-      "https://ohitsthatguy.xyz",
-      "http://localhost:5173",
+      "*",
     ]
     expose_headers    = []
     max_age           = 0
