@@ -13,3 +13,14 @@ export async function getActorById(actorId: number) {
   const collection = db.collection("actors");
   return collection.findOne({ id: actorId });
 }
+
+export async function updateActor(actorId: number, updateData: Partial<any>) {
+  const client = await getMongoClient();
+  const db = client.db(process.env.MONGODB_DB_NAME);
+  const collection = db.collection("actors");
+  return collection.updateOne(
+    { id: actorId },
+    { $set: updateData },
+    { upsert: true }
+  );
+}

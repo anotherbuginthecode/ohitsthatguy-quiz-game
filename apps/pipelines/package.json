@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "collection:actors": "ts-node -r tsconfig-paths/register src/infra/db/collections/actors.collection.ts",
+    "collection:actors": "ts-node -r tsconfig-paths/register src/infra/db/collections/actor.collection.ts",
     "collection:rounds": "ts-node -r tsconfig-paths/register  src/infra/db/collections/rounds.collection.ts",
     "collection:leaderboards": "ts-node -r tsconfig-paths/register  src/infra/db/collections/leaderboards.collection.ts",
     "collection:gameset": "ts-node -r tsconfig-paths/register  src/infra/db/collections/gameset.collection.ts",
     "seed:rounds": "ts-node -r tsconfig-paths/register src/scripts/seeds/rounds.seed.ts",
-    "seed:standard-game": "ts-node -r tsconfig-paths/register src/scripts/seeds/standard-game.seed.ts",
-    "seed:classic-game": "ts-node -r tsconfig-paths/register src/scripts/seeds/classic-game.seed.ts"
+    "seed:game": "ts-node -r tsconfig-paths/register src/scripts/seeds/game.seed.ts",
+    "seed:actors": "ts-node -r tsconfig-paths/register src/scripts/seeds/actors.seed.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.2",

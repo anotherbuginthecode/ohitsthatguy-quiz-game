@@ -135,7 +135,9 @@ async function seedingData(
   // Load actors and titles
   const { popularActors, titles } = await collectActorsAndMovie(API);
 
-  const MODES: ("standard" | "classic")[] = ["standard", "classic"];
+  // const MODES: ("standard" | "classic")[] = ["standard", "classic"];
+  const MODES: ("standard" | "classic")[] = ["standard"];
+
   const TARGET_COUNT = 50; // numero di game set per modalità
 
   for (const mode of MODES) {

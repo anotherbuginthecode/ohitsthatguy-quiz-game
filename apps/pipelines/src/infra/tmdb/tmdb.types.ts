@@ -16,3 +16,14 @@ export type Actor = {
   image: string | undefined;
   popularity: number;
 };
+
+export type ActorWithMovies = Actor & { movies: Movie[] };
+
+export type Movie = {
+  tmdb_id: number;
+  original_language: string;
+  poster_path: string;
+  release_date: string;
+  original_title: string;
+  popularity: number;
+};

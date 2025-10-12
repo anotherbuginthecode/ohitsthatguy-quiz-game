@@ -47,31 +47,31 @@ export async function generateClassicChallenge(
   const usedTitleIds = new Set<number>();
   const usedActorIds = new Set<number>();
 
-  // 3 Actor→Movie
-  for (let i = 0; i < 3; i++) {
+  // 4 Actor→Movie
+  for (let i = 0; i < 4; i++) {
     const actor = pick(actorsPool);
     const diff: Difficulty = i === 0 ? "easy" : "hard";
     rounds.push(await buildActorToMovie(api, actor, diff, usedTitleIds, 10));
   }
 
-  // 3 Movie→Actor
-  for (let i = 0; i < 3; i++) {
+  // 4 Movie→Actor
+  for (let i = 0; i < 4; i++) {
     const title = pick(titlesPool);
     const diff: Difficulty = i === 0 ? "easy" : "hard";
     rounds.push(await buildMovieToActor(api, title, diff, usedActorIds, 10));
   }
 
-  // 3 Popularity
-  for (let i = 0; i < 3; i++) {
-    const a = pick(actorsPool);
-    let b = pick(actorsPool);
-    let tries = 0;
-    while (b.tmdb_id === a.tmdb_id && tries++ < 5) b = pick(actorsPool);
-    rounds.push(buildPopularityRound(a, b, 10));
-  }
+  // // 3 Popularity
+  // for (let i = 0; i < 3; i++) {
+  //   const a = pick(actorsPool);
+  //   let b = pick(actorsPool);
+  //   let tries = 0;
+  //   while (b.tmdb_id === a.tmdb_id && tries++ < 5) b = pick(actorsPool);
+  //   rounds.push(buildPopularityRound(a, b, 10));
+  // }
 
-  // 1 True/False
-  {
+  // 2 True/False
+  for (let i = 0; i < 2; i++){
     const actor = pick(actorsPool);
     const movieOnly = titlesPool.filter((t) => t.medium === "movie");
     const title = pick(movieOnly.length ? movieOnly : titlesPool);

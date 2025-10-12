@@ -133,23 +133,6 @@ export function createTmdbApi(cfg: Cfg = {}): DataAPI {
       return (data.results ?? []).map((p) => mapPerson(p, IMAGE_BASE));
     },
 
-    // async getSimilar(t: Title, limit: number): Promise<Title[]> {
-    //   const data = await fetchJSON<{ results: any[] }>(
-    //     `${BASE}/${t.medium}/${t.id}/similar?${withKeyLang()}`
-    //   );
-    //   return data.results.slice(0, limit).map((c) => ({
-    //     id: c.id,
-    //     name: c.title || c.name,
-    //     original_language: c.original_language,
-    //     medium: t.medium,
-    //     year: (c.release_date || c.first_air_date || "").slice(0, 4)
-    //       ? parseInt((c.release_date || c.first_air_date).slice(0, 4))
-    //       : undefined,
-    //     genres: c.genre_ids ?? [],
-    //     popularity: c.popularity,
-    //   }));
-    // },
-
     async getSimilar(t: Title, limit: number): Promise<Title[]> {
       const url =
         t.medium === "movie"
@@ -175,22 +158,6 @@ export function createTmdbApi(cfg: Cfg = {}): DataAPI {
       }
     },
 
-    // async getRecommendations(t: Title, limit: number): Promise<Title[]> {
-    //   const data = await fetchJSON<{ results: any[] }>(
-    //     `${BASE}/${t.medium}/${t.id}/recommendations?${withKeyLang()}`
-    //   );
-    //   return data.results.slice(0, limit).map((c) => ({
-    //     id: c.id,
-    //     name: c.title || c.name,
-    //     original_language: c.original_language,
-    //     medium: t.medium,
-    //     year: (c.release_date || c.first_air_date || "").slice(0, 4)
-    //       ? parseInt((c.release_date || c.first_air_date).slice(0, 4))
-    //       : undefined,
-    //     genres: c.genre_ids ?? [],
-    //     popularity: c.popularity,
-    //   }));
-    // },
 
     // 6) Recommendations
     async getRecommendations(t: Title, limit: number): Promise<Title[]> {

@@ -18,6 +18,7 @@ async function createActorsCollection() {
             tmdb_id: { bsonType: "int" },
             name: { bsonType: "string" },
             image: { bsonType: "string" },
+            popularity: { bsonType: "double" },
             movies: {
               bsonType: "array",
               items: {
