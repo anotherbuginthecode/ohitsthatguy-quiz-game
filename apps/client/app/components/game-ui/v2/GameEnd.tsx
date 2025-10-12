@@ -15,17 +15,19 @@ function ScoreTab({
   score = 0,
   pickedAnswer,
   gameUUID,
+  mode,
   onPlayAgain,
 }: {
   score: number;
   pickedAnswer: PickedAnswer[];
   gameUUID?: string;
+  mode: "classic" | "standard";
   onPlayAgain: () => void;
 }) {
   const location = useLocation();
   const { tracker } = useAnalytics();
   const [showSurvey, setShowSurvey] = useState(false);
-  const lastScore = localStorage.getItem("lastScore") || "0";
+  const lastScore = localStorage.getItem(`lastscore_${mode}`) || "0";
 
   const trackFeedback = (
     feedback: "yes" | "no",
@@ -194,16 +196,18 @@ export default function GameEnd({
   score = 0,
   pickedAnswer,
   gameUUID,
+  mode,
   onPlayAgain,
 }: {
   score: number;
   pickedAnswer: PickedAnswer[];
   gameUUID?: string;
+  mode: "classic" | "standard";
   onPlayAgain: () => void;
 }) {
   useEffect(() => {
     window.scrollTo(0, 0);
-    localStorage.setItem("lastScore", score.toString());
+    localStorage.setItem(`lastscore_${mode}`, score.toString());
   }, [score]);
 
   return (
@@ -220,6 +224,7 @@ export default function GameEnd({
             pickedAnswer={pickedAnswer}
             gameUUID={gameUUID}
             onPlayAgain={onPlayAgain}
+            mode={mode}
           />
         </TabsContent>
         <TabsContent value="leaderboard" className="mt-4">

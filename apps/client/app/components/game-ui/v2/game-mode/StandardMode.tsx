@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "~/components/ui/card";
-import ActorImage from "../actorImage";
-import Option from "./Options";
+import ActorImage from "../../actorImage";
+import { Option } from "../Options";
 import type { Round } from "~/types/round.types";
 import { sendAnalyticsEvent } from "~/lib/ga-tracker";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
 
-export default function Playing({
+export default function StandardModePlaying({
   round,
   score = 0,
   onAnswer,
@@ -42,7 +42,7 @@ export default function Playing({
     <Card className="bg-gray-800/70 border border-gray-700 shadow-lg w-full mx-auto">
       <CardContent className="p-4">
         <div className="flex items-center mb-4 text-yellow-300 gap-2 justify-center">
-          <span>🏆</span>
+          <span>🍿</span>
           <span className="text-xl font-bold">{score}</span>
         </div>
         <div className="flex flex-col items-center space-y-4">

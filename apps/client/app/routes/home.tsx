@@ -74,24 +74,9 @@ export default function Home() {
             New Game <FaGamepad />
           </Link>
         </Button>
-        <Button
-          onClick={() => {
-            setOpen(true);
-            sendAnalyticsEvent(tracker, "how_to_play", {
-              action: "how_to_play",
-              category: "engagement",
-              label: "user opened how to play dialog",
-              sessionid: sessionid,
-              deviceid: deviceId,
-            });
-          }}
-          className="text-white hover:bg-yellow-300 hover:text-gray-950 w-fit cursor-pointer"
-        >
-          How to Play <IoDocumentTextOutline size={20} />
-        </Button>
+        <HowToPlayDialog />
       </div>
       {/* Dialog */}
-      <HowToPlayDialog open={open} onOpenChange={setOpen} />
     </div>
   );
 }
