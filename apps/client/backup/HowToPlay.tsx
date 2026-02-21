@@ -47,7 +47,7 @@ export default function HowToPlayV2({
     // },
 
     {
-      icon: "🏆",
+      icon: "🍿",
       title: "Faster = More Points!",
       description: "Speed and accuracy boost your score.",
     },
@@ -83,7 +83,7 @@ export default function HowToPlayV2({
     },
 
     {
-      icon: "🏆",
+      icon: "🍿",
       title: "Faster = More Points!",
       description: "Speed and accuracy boost your score.",
     },

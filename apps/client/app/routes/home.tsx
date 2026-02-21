@@ -46,37 +46,45 @@ export default function Home() {
   }, [location, tracker]);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-10 rounded-xl backdrop-blur-xs px-10 lg:px-20 h-full">
-      <div>
-        <img src={Logo} alt="Oh it's that guy!" className="h-32" />
+    <div className="h-screen overflow-hidden">
+      <div className="fixed top-5 z-50 right-5">
+        <Navbar />
       </div>
-      <div className="flex flex-col gap-5 text-center max-w-2xl">
-        <h1 className="font-baloo-bold text-3xl">
-          You’ve seen the actor before… where?
-        </h1>
-        <p className="font-baloo text-xl">Guess fast, climb the score!</p>
+
+      <div className="h-full flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-10 rounded-xl backdrop-blur-xs px-10 lg:px-20 h-full">
+          <div>
+            <img src={Logo} alt="Oh it's that guy!" className="h-32" />
+          </div>
+          <div className="flex flex-col gap-5 text-center max-w-2xl">
+            <h1 className="font-baloo-bold text-3xl">
+              You’ve seen the actor before… where?
+            </h1>
+            <p className="font-baloo text-xl">Guess fast, climb the score!</p>
+          </div>
+          <div className="flex justify-center w-full gap-4 ">
+            <Button className="cursor-pointer bg-yellow-300 text-gray-950 hover:bg-yellow-300 hover:text-white w-fit">
+              <Link
+                to={`/play/${sessionid}`}
+                className="flex justify-center items-center gap-2"
+                onClick={() => {
+                  sendAnalyticsEvent(tracker, "new_game", {
+                    action: "new_game",
+                    category: "engagement",
+                    label: "user started a new game",
+                    sessionid: sessionid,
+                    deviceid: deviceId,
+                  });
+                }}
+              >
+                New Game <span className="ml-1">🎮</span>
+              </Link>
+            </Button>
+            <HowToPlayDialog />
+          </div>
+          {/* Dialog */}
+        </div>
       </div>
-      <div className="flex justify-center w-full gap-4 ">
-        <Button className="cursor-pointer bg-yellow-300 text-gray-950 hover:bg-yellow-300 hover:text-white w-fit">
-          <Link
-            to={`/play/${sessionid}`}
-            className="flex justify-center items-center gap-2"
-            onClick={() => {
-              sendAnalyticsEvent(tracker, "new_game", {
-                action: "new_game",
-                category: "engagement",
-                label: "user started a new game",
-                sessionid: sessionid,
-                deviceid: deviceId,
-              });
-            }}
-          >
-            New Game <FaGamepad />
-          </Link>
-        </Button>
-        <HowToPlayDialog />
-      </div>
-      {/* Dialog */}
     </div>
   );
 }

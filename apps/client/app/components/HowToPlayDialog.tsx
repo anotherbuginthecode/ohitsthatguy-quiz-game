@@ -30,7 +30,7 @@ export default function HowToPlayDialog() {
           }}
           className="text-white hover:bg-yellow-300 hover:text-gray-950 w-fit cursor-pointer"
         >
-          How to Play <IoDocumentTextOutline size={20} />
+          How to Play <span className="ml-1">📝</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg sm:max-w-2xl bg-gray-950 text-white border border-white/10 rounded-2xl overflow-y-auto max-h-[90vh]">
@@ -40,7 +40,7 @@ export default function HowToPlayDialog() {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="h-full overflow-scroll">
+        <div className="h-full overflow-hidden">
           <div className="space-y-6 text-sm sm:text-base leading-relaxed">
             <section>
               <h2 className="text-xl font-semibold mb-1">🍿 The Concept</h2>

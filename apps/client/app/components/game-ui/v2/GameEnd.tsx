@@ -67,7 +67,7 @@ function ScoreTab({
           Game Over!
         </div>
         <div className="flex items-center text-yellow-300 gap-2 justify-center text-xl">
-          <span>🏆</span>
+          <span>�</span>
           <span className="text-3xl font-bold">{score}</span>
         </div>
         <div className="text-white">(prev. score: {lastScore})</div>
@@ -214,7 +214,7 @@ export default function GameEnd({
     <div>
       <Tabs defaultValue="score">
         <TabsList className="justify-center bg-gray-700/50 border-b border-gray-600 text-white">
-          <TabsTrigger value="score">🏆 Your Score</TabsTrigger>
+          <TabsTrigger value="score">🍿 Your Score</TabsTrigger>
           <TabsTrigger value="leaderboard">🏅 Leaderboard</TabsTrigger>
           <TabsTrigger value="social">📲 Social</TabsTrigger>
         </TabsList>

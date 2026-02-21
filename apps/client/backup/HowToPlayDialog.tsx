@@ -69,7 +69,7 @@ export function HowToPlayDialogStandardMode({
             <li>⏱ Only 30 seconds total.</li>
             <li>⌨️ Type as many valid titles as you can for one actor.</li>
             <li>
-              🏆 Scoring: +200 per correct title, with speed & streak bonuses.
+              🍿 Scoring: +200 per correct title, with speed & streak bonuses.
             </li>
             <li>❌ Mistakes = no points and cost time (-2s).</li>
           </ul>
@@ -155,7 +155,7 @@ export function HowToPlayDialogClassicMode({
             <li>⏱ Only 30 seconds total.</li>
             <li>⌨️ Type as many valid titles as you can for one actor.</li>
             <li>
-              🏆 Scoring: +200 per correct title, with speed & streak bonuses.
+              🍿 Scoring: +200 per correct title, with speed & streak bonuses.
             </li>
             <li>❌ Mistakes = no points and cost time (-2s).</li>
           </ul>
