@@ -27,10 +27,10 @@ async function collectActorsAndMovie(api: DataAPI) {
         console.log(
           `🎭 Updating actor: ${actor.name} (TMDB ID: ${actor.tmdb_id}) with popularity ${actor.popularity}`
         );
-      }else{
+      } else {
         console.log(`🎭 Updating actor: ${actor.name} (TMDB ID: ${actor.tmdb_id})`);
-        await updateActor(actor.tmdb_id, actor);
       }
+      await updateActor(actor.tmdb_id, actor);
     }
 
   } catch (error: any) {

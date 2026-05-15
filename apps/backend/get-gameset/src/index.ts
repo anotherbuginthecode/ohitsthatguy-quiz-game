@@ -12,7 +12,34 @@ export const handler = async (
   event: APIGatewayProxyEventV2,
   context: Context
 ): Promise<APIGatewayProxyResultV2> => {
+  const allowedOrigins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://www.ohitsthatguy.xyz",
+    "https://ohitsthatguy.xyz",
+  ];
+  const origin =
+    event.headers?.origin ||
+    event.headers?.Origin ||
+    event.headers?.referer ||
+    event.headers?.Referer ||
+    "";
+  const corsOrigin = allowedOrigins.find((o) => origin.startsWith(o)) || "";
+
+  if (!process.env.API_KEY || event.headers?.["x-api-key"] !== process.env.API_KEY) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ status: "error", message: "Unauthorized" }),
+    };
+  }
+
   const method = event.requestContext?.http?.method;
+  if (method !== "GET") {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ status: "error", message: "Method Not Allowed" }),
+    };
+  }
 
   const mode = event.queryStringParameters?.mode;
   if (mode !== "standard" && mode !== "classic") {
@@ -25,82 +52,60 @@ export const handler = async (
     };
   }
 
-  if (method !== "GET") {
+  try {
+    const client = await getMongoClient();
+    const db = client.db(process.env.MONGODB_DB);
+    const collection = db.collection<GameSetDoc>("gamesets");
+
+    const gameSetDoc = await collection.findOneAndUpdate(
+      { "meta.mode": mode },
+      {
+        $inc: { "_sys.servedCount": 1 },
+        $set: { "_sys.lastServedAt": new Date() },
+      },
+      {
+        sort: { "_sys.servedCount": 1, "_sys.createdAt": -1 },
+        returnDocument: "before",
+      }
+    );
+
+    if (!gameSetDoc) {
+      return {
+        statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": corsOrigin,
+          "Access-Control-Allow-Credentials": "true",
+        },
+        body: JSON.stringify({
+          status: "error",
+          message: "No game set found for the specified mode",
+        }),
+      };
+    }
+
+    const { rounds, meta } = gameSetDoc;
+
     return {
-      statusCode: 405,
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": corsOrigin,
+        "Access-Control-Allow-Credentials": "true",
+        Vary: "Origin",
+      },
       body: JSON.stringify({
-        status: "error",
-        message: "Method Not Allowed",
+        status: "success",
+        data: { rounds, meta },
       }),
     };
-  }
-
-  // CORS: consenti solo localhost e stesso dominio
-  const allowedOrigins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://www.ohitsthatguy.xyz",
-    "https://ohitsthatguy.xyz",
-  ];
-
-  const origin =
-    event.headers.origin ||
-    event.headers.Origin ||
-    event.headers.referer ||
-    event.headers.Referer ||
-    "";
-
-  const corsOrigin = allowedOrigins.find((o) => origin.startsWith(o)) || "";
-
-  const client = await getMongoClient();
-  const db = client.db(process.env.MONGODB_DB);
-  const collection = db.collection("gamesets");
-
-  const gameSetDoc = await db
-    .collection<GameSetDoc>("gamesets")
-    .find({ "meta.mode": mode })
-    .sort({ "_sys.servedCount": 1, "_sys.createdAt": -1 })
-    .limit(1)
-    .next();
-
-  if (!gameSetDoc) {
+  } catch (err) {
+    console.error("Unhandled error in get-gameset:", err);
     return {
-      statusCode: 404,
+      statusCode: 500,
       headers: {
         "Access-Control-Allow-Origin": corsOrigin,
         "Access-Control-Allow-Credentials": "true",
       },
-      body: JSON.stringify({
-        status: "error",
-        message: "No game set found for the specified mode",
-      }),
+      body: JSON.stringify({ status: "error", message: "Internal server error" }),
     };
   }
-
-  // Incrementa servedCount e aggiorna lastServedAt
-  await collection.updateOne(
-    { "_sys.gameSig": gameSetDoc._sys.gameSig },
-    {
-      $inc: { "_sys.servedCount": 1 },
-      $set: { "_sys.lastServedAt": new Date() },
-    }
-  );
-
-  const { rounds, meta } = gameSetDoc;
-
-  return {
-    statusCode: 200,
-    headers: {
-      "Access-Control-Allow-Origin": corsOrigin,
-      "Access-Control-Allow-Credentials": "true",
-      Vary: "Origin",
-    },
-    body: JSON.stringify({
-      status: "success",
-      data: {
-        rounds,
-        meta,
-      },
-    }),
-  };
 };

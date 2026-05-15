@@ -67,3 +67,5 @@ pytestdebug.log
 .mypy_cache/
 .dmypy.json
 .pyre/
+.agents
+.claude

@@ -51,7 +51,7 @@ function ScoreTab({
         feedback: feedback,
       },
     };
-    if (process.env.NODE_ENV === "development") {
+    if (import.meta.env.DEV) {
       console.log("Feedback payload:", payload);
     } else {
       postData("api/store/events", payload).catch((error) => {
@@ -129,13 +129,13 @@ function LeaderboardTab() {
           <QuickFeedback
             message="Would you like to see a global leaderboard?"
             onFeedback={(feeback) => {
-              if (process.env.NODE_ENV === "development") {
+              if (import.meta.env.DEV) {
                 console.log("Leaderboard feedback:", feeback);
                 return;
               }
               postData("api/store/events", {
                 event: "leaderboard_feedback",
-                sessionid: localStorage.getItem("sessionid") || "unknown",
+                sessionid: localStorage.getItem("anonymousId") || crypto.randomUUID(),
                 props: {
                   feedback: feeback,
                   timestamp: new Date().toISOString(),
@@ -167,14 +167,14 @@ function SocialTab() {
           <QuickFeedback
             message="Would you find this feature useful or fun?"
             onFeedback={(feeback) => {
-              if (process.env.NODE_ENV === "development") {
-                console.log("Sociale feedback:", feeback);
+              if (import.meta.env.DEV) {
+                console.log("Social feedback:", feeback);
                 return;
               }
               postData("api/store/events", {
                 event: "social_sharing_feedback",
+                sessionid: localStorage.getItem("anonymousId") || crypto.randomUUID(),
                 props: {
-                  sessionid: localStorage.getItem("sessionid") || "unknown",
                   feeback: feeback,
                   timestamp: new Date().toISOString(),
                 },

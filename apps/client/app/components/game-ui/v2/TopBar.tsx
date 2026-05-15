@@ -34,7 +34,7 @@ export default function TopBar({
       </div>
       <div className="w-full">
         <Progress
-          value={Math.round(((round === 1 ? 0.2 : round) / totalRounds) * 100)}
+          value={Math.round((round / totalRounds) * 100)}
           className="h-2 bg-gray-200/20"
         />
       </div>

@@ -25,7 +25,8 @@ export async function buildActorToMovie(
   actor: Actor,
   difficulty: Difficulty,
   usedTitleIds: Set<number>,
-  timeLimitSec = 10
+  timeLimitSec = 10,
+  globalTitlesPool: Title[] = []
 ): Promise<ActorToMovieRound> {
   const credits = (await api.getFilteredCredits(actor.tmdb_id)).filter(
     (t) =>
@@ -68,7 +69,13 @@ export async function buildActorToMovie(
 
   // Fallback se non bastano
   if (distractors.length < 2) {
-    distractors = credits.filter((t) => t.id !== correct.id).slice(0, 2);
+    const safeDistractors = globalTitlesPool.filter(
+      (t) => t.id !== correct.id && !usedTitleIds.has(t.id)
+    );
+    distractors = [
+      ...distractors,
+      ...safeDistractors.slice(0, 2 - distractors.length),
+    ];
   }
 
   const choices = [correct, ...distractors].sort(() => Math.random() - 0.5);
@@ -214,8 +221,7 @@ export async function buildActorInMovieTF(
         validTitles[Math.floor(Math.random() * validTitles.length)];
       // Verifica che l'attore sia effettivamente nel cast del nuovo titolo
       const newCastIds = await api.getTopCast(newTitle.id, newTitle.medium, 20);
-      if (!newCastIds.includes(actor.tmdb_id))
-        // Restituisci il round con il nuovo titolo
+      if (newCastIds.includes(actor.tmdb_id)) {
         return {
           type: "ACTOR_IN_MOVIE_TF",
           difficulty: "easy",
@@ -224,6 +230,10 @@ export async function buildActorInMovieTF(
           title: newTitle,
           correctAnswer: "YES",
         };
+      }
+      throw new Error(
+        `Cannot build YES round: actor ${actor.tmdb_id} not found in fallback title ${newTitle.id}`
+      );
     }
     return {
       type: "ACTOR_IN_MOVIE_TF",

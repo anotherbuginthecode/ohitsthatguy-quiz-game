@@ -49,7 +49,7 @@ export function sendAnalyticsEvent(
   eventName: string,
   params: Record<string, any>
 ) {
-  if (process.env.NODE_ENV === "production") {
+  if (!import.meta.env.DEV) {
     tracker.trackEvent(eventName, params);
   } else {
     console.log("Event:", eventName, params);

@@ -28,3 +28,19 @@ docker build --platform linux/amd64 -t $ECR_REPO:$IMAGE_TAG .
 docker push $ECR_REPO:$IMAGE_TAG
 
 echo "Docker image deployed to ECR: $ECR_REPO:$IMAGE_TAG"
+
+# Update the Lambda function to use the new image
+LAMBDA_FUNCTION_NAME="ohitsthatguy-api-$ECR_REPO_NAME"
+echo "Updating Lambda function: $LAMBDA_FUNCTION_NAME..."
+aws lambda update-function-code \
+  --function-name "$LAMBDA_FUNCTION_NAME" \
+  --image-uri "$ECR_REPO:$IMAGE_TAG" \
+  --region "$AWS_REGION" \
+  --output text
+
+echo "Waiting for Lambda update to complete..."
+aws lambda wait function-updated \
+  --function-name "$LAMBDA_FUNCTION_NAME" \
+  --region "$AWS_REGION"
+
+echo "Lambda $LAMBDA_FUNCTION_NAME updated successfully."

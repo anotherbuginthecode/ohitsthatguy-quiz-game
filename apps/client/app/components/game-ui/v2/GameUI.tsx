@@ -115,9 +115,10 @@ export default function GameUI({
         deviceuuid: localStorage.getItem("anonymous_device") || "unknown",
       });
 
-      setCurrentRound(currentRound + 1);
+      const nextRound = currentRound + 1;
+      setCurrentRound(nextRound);
       setCurrentActor(
-        fetchedRounds ? fetchedRounds[currentRound] : mockRounds[currentRound]
+        fetchedRounds ? fetchedRounds[nextRound - 1] : mockRounds[nextRound - 1]
       );
       setGamePhase("playing");
     } else {

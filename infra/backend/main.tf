@@ -45,18 +45,17 @@ resource "aws_apigatewayv2_api" "api" {
     allow_headers     = [
       "authorization",
       "content-type",
+      "x-api-key",
     ]
     allow_methods     = [
       "GET",
       "OPTIONS",
       "POST",
     ]
-    # allow_origins     = [
-    #   "https://ohitsthatguy.xyz",
-    #   "http://localhost:5173",
-    # ]
     allow_origins     = [
-      "*",
+      "https://ohitsthatguy.xyz",
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
     ]
     expose_headers    = []
     max_age           = 0

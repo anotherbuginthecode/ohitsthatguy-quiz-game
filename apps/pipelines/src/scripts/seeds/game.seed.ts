@@ -66,7 +66,7 @@ async function collectActorsAndMovie(api: DataAPI) {
 async function insertGameSet(game: GameRoundsSet): Promise<boolean> {
   try {
     const roundSigs = game.rounds.map(roundSignature);
-    const gameSig = gameSignature("standard", game.rounds);
+    const gameSig = gameSignature(game.meta.mode, game.rounds);
     const gameSetWithSigs: GameRoundsSetWithSignatures = {
       ...game,
       _sys: {
@@ -110,7 +110,7 @@ async function seedingData(
     attempts++;
     const game =
       mode === "standard"
-        ? await generateStandardGameSet(api, actors)
+        ? await generateStandardGameSet(api, actors, titles)
         : await generateClassicChallenge(api, actors, titles);
 
     const success = await insertGameSet(game);

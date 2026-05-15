@@ -25,7 +25,9 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   const location = useLocation();
   const { tracker } = useAnalytics();
-  const [sessionid, setSessionid] = useState<string | null>(null);
+  const [sessionid, setSessionid] = useState<string>(
+    () => localStorage.getItem("anonymousId") ?? crypto.randomUUID()
+  );
   const [deviceId, setDeviceId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -37,10 +39,9 @@ export default function Home() {
     sendAnalyticsEvent(tracker, "session_start", {
       action: "land_home",
       category: "engagement",
-      sessionid:
-        process.env.NODE_ENV === "development"
-          ? "11111111-1111-1111-1111-111111111111"
-          : anonymousId,
+      sessionid: import.meta.env.DEV
+        ? "11111111-1111-1111-1111-111111111111"
+        : anonymousId,
       deviceid: deviceUUID,
     });
   }, [location, tracker]);

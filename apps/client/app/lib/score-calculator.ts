@@ -27,7 +27,3 @@ export function calculatePoints(
 
   return { points, streak };
 }
-
-// Example usage
-const config = { base: 100, totalTime: 90 };
-console.log(calculatePoints(true, 80, config, 0));
