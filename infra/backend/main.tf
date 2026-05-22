@@ -5,6 +5,7 @@ terraform {
 		key            = "infra/backend/terraform.tfstate"
 		region         = "eu-west-1"
 		encrypt        = true
+		dynamodb_table = "ohitsthatguy-tfstate-lock"
 	}
 }
 
@@ -41,7 +42,7 @@ resource "aws_apigatewayv2_api" "api" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_credentials = false
+    allow_credentials = true
     allow_headers     = [
       "authorization",
       "content-type",
@@ -54,11 +55,12 @@ resource "aws_apigatewayv2_api" "api" {
     ]
     allow_origins     = [
       "https://ohitsthatguy.xyz",
+      "https://www.ohitsthatguy.xyz",
       "http://localhost:5173",
       "http://127.0.0.1:5173",
     ]
     expose_headers    = []
-    max_age           = 0
+    max_age           = 86400
   }
 }
 

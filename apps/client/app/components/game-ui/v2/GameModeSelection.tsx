@@ -5,8 +5,23 @@ import { useAnalytics } from "@keiko-app/react-google-analytics";
 import { Link } from "react-router";
 import { FaArrowLeft } from "react-icons/fa";
 import { Button } from "~/components/ui/button";
-import { IoDocumentTextOutline } from "react-icons/io5";
-import { MdPlayArrow } from "react-icons/md";
+import { Film, Clapperboard } from "lucide-react";
+
+const gameModes = [
+  {
+    title: "Standard Edition",
+    icon: <Film className="w-5 h-5" aria-hidden="true" />,
+    description: "Play the classic actor-to-film quiz — 5 rounds.",
+    mode: "standard" as const,
+  },
+  {
+    title: "Director's Cut",
+    icon: <Clapperboard className="w-5 h-5" aria-hidden="true" />,
+    description:
+      "Unlock the full cinematic experience — mixed question types, 10 rounds, higher difficulty.",
+    mode: "classic" as const,
+  },
+];
 
 export default function GameModeSelection({
   onSelectMode,
@@ -14,26 +29,13 @@ export default function GameModeSelection({
   onSelectMode: (mode: "classic" | "standard") => void;
 }) {
   const { tracker } = useAnalytics();
-  const gameMode = [
-    {
-      title: "🎥 Standard Edition",
-      description: "Play the classic actor-to-film quiz — 5 rounds.",
-      mode: "standard",
-    },
-    {
-      title: "🎬 Director’s Cut",
-      description:
-        "Unlock the full cinematic experience — mixed question types, 10 rounds, higher difficulty.",
-      mode: "classic",
-    },
-  ];
 
   return (
     <div>
       <div className="py-5">
-        <Button>
+        <Button aria-label="Back to home">
           <Link to="/">
-            <FaArrowLeft />
+            <FaArrowLeft aria-hidden="true" />
           </Link>
         </Button>
       </div>
@@ -42,10 +44,11 @@ export default function GameModeSelection({
           Choose Your Game Mode
         </h1>
         <div className="grid grid-cols-1 gap-6 w-full max-w-4xl text-white">
-          {gameMode.map((mode) => (
-            <div
+          {gameModes.map((mode) => (
+            <button
               key={mode.mode}
-              className="bg-gray-800/70 border border-gray-700 shadow-lg p-6 rounded-lg flex flex-col gap-2 hover:border-yellow-300 cursor-pointer transition"
+              type="button"
+              className="bg-gray-800/70 border border-gray-700 shadow-lg p-6 rounded-lg flex flex-col gap-2 hover:border-yellow-300 cursor-pointer transition text-left w-full"
               onClick={() => {
                 sendAnalyticsEvent(tracker, "game_mode_selected", {
                   action: "game_mode_selected",
@@ -55,14 +58,17 @@ export default function GameModeSelection({
                   deviceuuid:
                     localStorage.getItem("anonymous_device") || "unknown",
                 });
-                onSelectMode(mode.mode as "classic" | "standard");
+                onSelectMode(mode.mode);
               }}
             >
               <div>
-                <h2 className="text-xl font-bold mb-2">{mode.title}</h2>
+                <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+                  {mode.icon}
+                  {mode.title}
+                </h2>
                 <p className="text-gray-300">{mode.description}</p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </GameLayout>

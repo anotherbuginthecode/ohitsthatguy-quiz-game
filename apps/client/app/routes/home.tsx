@@ -58,7 +58,7 @@ export default function Home() {
         <p className="font-baloo text-xl">Guess fast, climb the score!</p>
       </div>
       <div className="flex justify-center w-full gap-4 ">
-        <Button className="cursor-pointer bg-yellow-300 text-gray-950 hover:bg-yellow-300 hover:text-white w-fit">
+        <Button className="cursor-pointer bg-yellow-300 text-gray-950 hover:bg-yellow-400 hover:text-gray-950 w-fit">
           <Link
             to={`/play/${sessionid}`}
             className="flex justify-center items-center gap-2"

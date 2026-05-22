@@ -8,15 +8,17 @@ export default function ActorImage({
   fullname: string;
 }) {
   return (
-    <div className="flex flex-col items-center space-y-2">
-      <div className="w-32 h-32">
+    <div className="flex flex-col items-center space-y-3">
+      <div className="w-48 h-56 overflow-hidden rounded-xl shadow-lg">
         <img
           src={`https://image.tmdb.org/t/p/w500${imageUrl}`}
           alt={fullname}
-          className="w-full h-full object-cover rounded-full shadow-md"
+          width={192}
+          height={224}
+          className="w-full h-full object-cover object-top"
         />
       </div>
-      <div className="text-sm text-white">{fullname}</div>
+      <div className="text-sm text-white font-semibold">{fullname}</div>
     </div>
   );
 }

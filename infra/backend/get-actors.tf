@@ -6,12 +6,13 @@ resource "aws_ecr_repository" "lambda_repo" {
 
 # Lambda in container
 resource "aws_lambda_function" "get_actors" {
-  function_name = "ohitsthatguy-api-get-actors"
-  package_type  = "Image"
-  image_uri     = "${aws_ecr_repository.lambda_repo.repository_url}:latest"
-  role          = aws_iam_role.lambda_exec.arn
-  timeout       = 30
-  memory_size   = 512
+  function_name                  = "ohitsthatguy-api-get-actors"
+  package_type                   = "Image"
+  image_uri                      = "${aws_ecr_repository.lambda_repo.repository_url}:latest"
+  role                           = aws_iam_role.lambda_exec.arn
+  timeout                        = 30
+  memory_size                    = 512
+
 
     environment {
     variables = {
@@ -33,7 +34,7 @@ resource "aws_apigatewayv2_integration" "get_actors_integration" {
 
 resource "aws_apigatewayv2_route" "get_actors_route" {
   api_id    = aws_apigatewayv2_api.api.id
-  route_key = "ANY /api/actors"
+  route_key = "GET /api/actors"
   target    = "integrations/${aws_apigatewayv2_integration.get_actors_integration.id}"
 }
 

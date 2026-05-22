@@ -16,6 +16,7 @@ public/dist
 .crash
 .terraform/
 terraform.tfvars
+vars.tfvars
 override.tf
 override.tf.json
 *_override.tf

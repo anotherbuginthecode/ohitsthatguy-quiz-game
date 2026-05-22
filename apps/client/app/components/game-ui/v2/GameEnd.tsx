@@ -10,6 +10,7 @@ import { useLocation } from "react-router";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import GiveAFeedbackBanner from "~/components/GiveAFeedbackBanner";
+import { Trophy, Medal, Share2 } from "lucide-react";
 
 function ScoreTab({
   score = 0,
@@ -67,8 +68,8 @@ function ScoreTab({
           Game Over!
         </div>
         <div className="flex items-center text-yellow-300 gap-2 justify-center text-xl">
-          <span>🏆</span>
-          <span className="text-3xl font-bold">{score}</span>
+          <Trophy className="w-6 h-6" aria-hidden="true" />
+          <span className="text-3xl font-bold tabular-nums">{score}</span>
         </div>
         <div className="text-white">(prev. score: {lastScore})</div>
         <div>
@@ -79,6 +80,7 @@ function ScoreTab({
                 <Avatar className="w-10 h-10">
                   <AvatarImage
                     src={`https://image.tmdb.org/t/p/w500${actor.image}`}
+                    alt={actor.name}
                   />
                   <AvatarFallback>{actor.name}</AvatarFallback>
                 </Avatar>
@@ -86,30 +88,25 @@ function ScoreTab({
                   className={`absolute inset-0 ${
                     actor.correct ? "bg-green-500" : "bg-red-500"
                   } opacity-40 rounded-full pointer-events-none`}
+                  aria-hidden="true"
                 />
+                <span className="sr-only">
+                  {actor.name}: {actor.correct ? "correct" : "incorrect"}
+                </span>
               </div>
             ))}
           </div>
         </div>
-        {/* <div className="text-center text-white">
-          Thanks for playing! Share your score and challenge your friends!
-        </div> */}
         <div className="flex flex-col items-center gap-3 text-center text-md text-white mt-4">
           <p>Your memory vs the clock… ready for revenge?</p>
           <Button
-            className="border border-yellow-300 animate-pulse bg-yellow-300 hover:bg-yellow-700 text-gray-950 p-5"
+            className="border border-yellow-300 motion-safe:animate-pulse bg-yellow-300 hover:bg-yellow-400 text-gray-950 p-5"
             onClick={onPlayAgain}
           >
-            🔥 Beat Your Score! 🔥
+            Beat Your Score!
           </Button>
         </div>
         <div className="w-full flex flex-col items-center">
-          {/* <QuickFeedback
-            message="Did you enjoy the game?"
-            onFeedback={(feeback) => trackFeedback(feeback, "game_feedback")}
-          />
-          {showSurvey && <GiveAFeedbackBanner />} */}
-
           <GiveAFeedbackBanner />
         </div>
       </CardContent>
@@ -214,9 +211,15 @@ export default function GameEnd({
     <div>
       <Tabs defaultValue="score">
         <TabsList className="justify-center bg-gray-700/50 border-b border-gray-600 text-white">
-          <TabsTrigger value="score">🏆 Your Score</TabsTrigger>
-          <TabsTrigger value="leaderboard">🏅 Leaderboard</TabsTrigger>
-          <TabsTrigger value="social">📲 Social</TabsTrigger>
+          <TabsTrigger value="score" className="flex items-center gap-1.5">
+            <Trophy className="w-4 h-4" aria-hidden="true" /> Your Score
+          </TabsTrigger>
+          <TabsTrigger value="leaderboard" className="flex items-center gap-1.5">
+            <Medal className="w-4 h-4" aria-hidden="true" /> Leaderboard
+          </TabsTrigger>
+          <TabsTrigger value="social" className="flex items-center gap-1.5">
+            <Share2 className="w-4 h-4" aria-hidden="true" /> Social
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="score" className="mt-4">
           <ScoreTab
@@ -228,14 +231,10 @@ export default function GameEnd({
           />
         </TabsContent>
         <TabsContent value="leaderboard" className="mt-4">
-          <div>
-            <LeaderboardTab />
-          </div>
+          <LeaderboardTab />
         </TabsContent>
         <TabsContent value="social" className="mt-4">
-          <div className="text-center text-white">
-            <SocialTab />
-          </div>
+          <SocialTab />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
 import { Card, CardContent } from "~/components/ui/card";
-
-import { useAnalytics } from "@keiko-app/react-google-analytics";
+import { Zap } from "lucide-react";
 import {
   ACTOR_TO_MOVIE,
   MOVIE_TO_ACTOR,
@@ -18,16 +16,12 @@ export default function ClassicModePlaying({
   score: number;
   onAnswer: (isCorrect: boolean) => void;
 }) {
-  const { tracker } = useAnalytics();
-
-  console.debug("Rendering ClassicModePlaying with round:", round);
-
   return (
     <Card className="bg-gray-800/70 border border-gray-700 shadow-lg w-full mx-auto">
       <CardContent className="p-4">
         <div className="flex items-center mb-4 text-yellow-300 gap-2 justify-center">
-          <span>🍿</span>
-          <span className="text-xl font-bold">{score}</span>
+          <Zap className="w-5 h-5" aria-hidden="true" />
+          <span className="text-xl font-bold tabular-nums">{score}</span>
         </div>
 
         {round && round.type === "ACTOR_TO_MOVIE" && (

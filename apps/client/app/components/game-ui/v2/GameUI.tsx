@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import TopBar from "./TopBar";
 import StandardModePlaying from "./game-mode/StandardMode";
 import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import { calculatePoints } from "~/lib/score-calculator";
 import { mockRounds } from "~/lib/mock";
-import { BsSkipForwardFill } from "react-icons/bs";
 import GameEnd from "./GameEnd";
 import type { Round, ClassicRound } from "~/types/round.types";
 import type { PickedAnswer } from "~/types/answer.types";
-import { Badge } from "~/components/ui/badge";
 import { sendAnalyticsEvent } from "~/lib/ga-tracker";
 import { useAnalytics } from "@keiko-app/react-google-analytics";
 import ClassicModePlaying from "./game-mode/ClassicMode";
@@ -17,7 +22,6 @@ export type GamePhase = "playing" | "roundEnd" | "gameEnd";
 
 export default function GameUI({
   fetchedRounds,
-  // secondChanceRound,
   gameUUID,
   onPlayAgain,
   totalRounds,
@@ -33,7 +37,9 @@ export default function GameUI({
   onPlayAgain: () => void;
 }) {
   const { tracker } = useAnalytics();
+  const navigate = useNavigate();
   const basePoints = 100;
+  const [abandonOpen, setAbandonOpen] = useState(false);
   const [secondChanceCounter, setSecondChanceCounter] = useState(1);
   const [currentRound, setCurrentRound] = useState(1);
   const [currentActor, setCurrentActor] = useState(
@@ -60,7 +66,6 @@ export default function GameUI({
       ]);
     }
 
-    // Here you can also send the answer to your backend or analytics service
     if (isCorrect) {
       const { points, streak } = calculatePoints(
         isCorrect,
@@ -81,29 +86,6 @@ export default function GameUI({
     }
     setGamePhase("roundEnd");
   };
-
-  // const handleSkip = () => {
-  //   if (secondChanceCounter <= 0) return;
-  //   if (currentRound < totalRounds) {
-  //     sendAnalyticsEvent(tracker, "second_chance_used", {
-  //       action: "second_chance_used",
-  //       category: "engagement",
-  //       label: "user used second chance",
-  //       sessionid: localStorage.getItem("anonymousId") || "unknown",
-  //       deviceuuid: localStorage.getItem("anonymous_device") || "unknown",
-  //     });
-  //     setTimeLeft((prev) => Math.max(prev - 10, 0));
-  //     setSecondChanceCounter((prev) => Math.max(prev - 1, 0));
-  //     setCurrentActor(
-  //       secondChanceRound ? secondChanceRound : mockRounds[currentRound]
-  //     );
-  //   }
-  //   if (timeLeft <= 5) {
-  //     setTimeLeft(0);
-  //     setGamePhase("roundEnd");
-  //     return;
-  //   }
-  // };
 
   const handleNext = () => {
     if (currentRound < totalRounds) {
@@ -145,6 +127,7 @@ export default function GameUI({
           round={currentRound}
           totalRounds={totalRounds}
           timeLeft={timeLeft}
+          onBackClick={() => setAbandonOpen(true)}
         />
         <div className="container px-2">
           {gamePhase !== "gameEnd" && gameMode === "standard" && (
@@ -173,34 +156,43 @@ export default function GameUI({
         </div>
         {gamePhase !== "gameEnd" && (
           <div className="container px-2 flex items-center w-full justify-center">
-            {/* {gamePhase === "playing" && (
-              <Button
-                className="text-white hover:bg-yellow-700 w-fit border border-yellow-300"
-                onClick={handleSkip}
-              >
-                <span>
-                  ⚡ Second Chance (-10s)
-                  <Badge className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums bg-white text-gray-950 ml-2">
-                    {secondChanceCounter}
-                  </Badge>
-                </span>
-              </Button>
-            )} */}
             {gamePhase === "roundEnd" && (
               <Button
-                className="bg-yellow-300 hover:bg-green-700 text-gray-950 w-2/3"
+                className="bg-yellow-300 hover:bg-yellow-400 text-gray-950 w-2/3"
                 onClick={handleNext}
               >
-                <span>Next</span>
+                Next
               </Button>
             )}
           </div>
         )}
       </div>
+
+      <Dialog open={abandonOpen} onOpenChange={setAbandonOpen}>
+        <DialogContent className="bg-gray-900 border border-gray-700 text-white max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Abandon game?</DialogTitle>
+          </DialogHeader>
+          <p className="text-gray-300 text-sm">
+            Your current score will be lost. Are you sure you want to quit?
+          </p>
+          <div className="flex gap-3 justify-end mt-2">
+            <Button
+              variant="outline"
+              className="border-gray-600 text-white hover:bg-gray-800"
+              onClick={() => setAbandonOpen(false)}
+            >
+              Keep playing
+            </Button>
+            <Button
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={() => navigate("/")}
+            >
+              Abandon
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
-}
-
-export function GameUIClassicMode() {
-  return;
 }

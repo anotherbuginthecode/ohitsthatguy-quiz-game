@@ -1,6 +1,6 @@
-import { mockClassicGame } from "./mock";
+import { mockClassicGame, mockStandardGame } from "./mock";
 
-const BASE_URL = (import.meta.env.VITE_APP_API_URL as string).replace(/\/$/, "");
+const BASE_URL = ((import.meta.env.VITE_APP_API_URL as string) ?? "").replace(/\/$/, "");
 
 // In dev, requests go directly to API Gateway and must carry the key.
 // In production, CloudFront injects the key server-side — never set in the prod bundle.
@@ -39,12 +39,14 @@ export async function postData(endpoint: string, data: any) {
 
 export async function fetchClassicGameset() {
   if (import.meta.env.DEV) {
-    console.log("Using mock classic game data");
-    return Promise.resolve(mockClassicGame);
+    return Promise.resolve({ data: { rounds: mockClassicGame, meta: { mode: "classic" } } });
   }
   return fetchData("api/gameset?mode=classic");
 }
 
 export async function fetchStandardGameset() {
+  if (import.meta.env.DEV) {
+    return Promise.resolve({ data: { rounds: mockStandardGame, meta: { mode: "standard" } } });
+  }
   return fetchData("api/gameset?mode=standard");
 }

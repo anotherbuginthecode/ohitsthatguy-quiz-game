@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "~/components/ui/card";
+import { Zap } from "lucide-react";
 import ActorImage from "../../actorImage";
 import { Option } from "../Options";
 import type { Round } from "~/types/round.types";
@@ -17,8 +18,10 @@ export default function StandardModePlaying({
 }) {
   const { tracker } = useAnalytics();
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
+  const answered = selectedTitle !== null;
 
   const onSelectOption = (title: string) => {
+    if (answered) return;
     sendAnalyticsEvent(tracker, "answer_selected", {
       action: "answer_selected",
       category: "engagement",
@@ -32,8 +35,6 @@ export default function StandardModePlaying({
     onAnswer(isCorrect);
   };
 
-  const showCorrect = selectedTitle !== null;
-
   useEffect(() => {
     setSelectedTitle(null);
   }, [round]);
@@ -42,8 +43,8 @@ export default function StandardModePlaying({
     <Card className="bg-gray-800/70 border border-gray-700 shadow-lg w-full mx-auto">
       <CardContent className="p-4">
         <div className="flex items-center mb-4 text-yellow-300 gap-2 justify-center">
-          <span>🍿</span>
-          <span className="text-xl font-bold">{score}</span>
+          <Zap className="w-5 h-5" aria-hidden="true" />
+          <span className="text-xl font-bold tabular-nums">{score}</span>
         </div>
         <div className="flex flex-col items-center space-y-4">
           <ActorImage
@@ -58,8 +59,7 @@ export default function StandardModePlaying({
           <div className="grid grid-cols-1 gap-3 mt-4">
             {round.choices.map((choice, index) => {
               const isSelected = selectedTitle === choice.name;
-              // Show correct if selected, otherwise only show selected
-              const isCorrect = showCorrect && choice.id === round.correctId;
+              const isCorrect = answered && choice.id === round.correctId;
               return (
                 <Option
                   key={index}
@@ -67,6 +67,7 @@ export default function StandardModePlaying({
                   onSelect={() => onSelectOption(choice.name)}
                   isCorrect={isCorrect}
                   isSelected={isSelected}
+                  disabled={answered}
                 />
               );
             })}

@@ -304,6 +304,94 @@ export const mockRounds = [
 
 
 
+export const mockStandardGame = [
+  {
+    type: "ACTOR_TO_MOVIE",
+    difficulty: "easy",
+    timeLimitSec: 30,
+    actor: {
+      tmdb_id: 31,
+      name: "Tom Hanks",
+      image: "/xndWFsBlClOJFRdhSt4NBwiPq2o.jpg",
+      popularity: null,
+    },
+    choices: [
+      { id: 845781, name: "Red One", original_language: "en", medium: "movie", year: 2024, genres: [28, 35, 14], popularity: 12.5 },
+      { id: 13, name: "Forrest Gump", original_language: "en", medium: "movie", year: 1994, genres: [35, 18, 10749], popularity: 22.1 },
+      { id: 197, name: "Braveheart", original_language: "en", medium: "movie", year: 1995, genres: [28, 18], popularity: 8.4 },
+    ],
+    correctId: 13,
+  },
+  {
+    type: "ACTOR_TO_MOVIE",
+    difficulty: "easy",
+    timeLimitSec: 30,
+    actor: {
+      tmdb_id: 1245,
+      name: "Scarlett Johansson",
+      image: "/6NsMbJXRlDZuDzatN2akFdGuTvx.jpg",
+      popularity: null,
+    },
+    choices: [
+      { id: 299537, name: "Captain Marvel", original_language: "en", medium: "movie", year: 2019, genres: [28, 12, 878], popularity: 15.8 },
+      { id: 1930, name: "Lost in Translation", original_language: "en", medium: "movie", year: 2003, genres: [18, 35, 10749], popularity: 7.3 },
+      { id: 9800, name: "The Holiday", original_language: "en", medium: "movie", year: 2006, genres: [18, 35, 10749], popularity: 6.1 },
+    ],
+    correctId: 1930,
+  },
+  {
+    type: "ACTOR_TO_MOVIE",
+    difficulty: "hard",
+    timeLimitSec: 30,
+    actor: {
+      tmdb_id: 2888,
+      name: "Will Smith",
+      image: "/nI9QziPJXnNXR0oUHe86XeUCFgN.jpg",
+      popularity: null,
+    },
+    choices: [
+      { id: 157336, name: "Interstellar", original_language: "en", medium: "movie", year: 2014, genres: [12, 18, 878], popularity: 21.7 },
+      { id: 96721, name: "Rush", original_language: "en", medium: "movie", year: 2013, genres: [28, 18], popularity: 7.2 },
+      { id: 6479, name: "Hitch", original_language: "en", medium: "movie", year: 2005, genres: [35, 10749, 18], popularity: 8.9 },
+    ],
+    correctId: 6479,
+  },
+  {
+    type: "ACTOR_TO_MOVIE",
+    difficulty: "hard",
+    timeLimitSec: 30,
+    actor: {
+      tmdb_id: 5064,
+      name: "Cate Blanchett",
+      image: "/gMDiMaMV9JZiFHPbxRefbRTBFkR.jpg",
+      popularity: null,
+    },
+    choices: [
+      { id: 11036, name: "The Notebook", original_language: "en", medium: "movie", year: 2004, genres: [18, 10749], popularity: 11.3 },
+      { id: 166426, name: "Pirates of the Caribbean: Dead Men Tell No Tales", original_language: "en", medium: "movie", year: 2017, genres: [28, 12, 14, 35], popularity: 13.1 },
+      { id: 44228, name: "The Aviator", original_language: "en", medium: "movie", year: 2004, genres: [18], popularity: 7.6 },
+    ],
+    correctId: 44228,
+  },
+  {
+    type: "ACTOR_TO_MOVIE",
+    difficulty: "hard",
+    timeLimitSec: 30,
+    actor: {
+      tmdb_id: 2231,
+      name: "Samuel L. Jackson",
+      image: "/nCJJ3NVksLp5hNqKoKXGbOiDmBq.jpg",
+      popularity: null,
+    },
+    choices: [
+      { id: 146233, name: "Prisoners", original_language: "en", medium: "movie", year: 2013, genres: [80, 18, 9648, 53], popularity: 10.6 },
+      { id: 68721, name: "Django Unchained", original_language: "en", medium: "movie", year: 2012, genres: [18, 53, 28], popularity: 18.2 },
+      { id: 264644, name: "Room", original_language: "en", medium: "movie", year: 2015, genres: [18, 53], popularity: 6.9 },
+    ],
+    correctId: 68721,
+  },
+];
+
 export const mockClassicGame = [
   {
     type: "ACTOR_TO_MOVIE",

@@ -6,12 +6,13 @@ data "aws_ecr_repository" "get_rounds" {
 
 # Lambda in container
 resource "aws_lambda_function" "get_rounds" {
-  function_name = "ohitsthatguy-api-get-rounds"
-  package_type  = "Image"
-  image_uri     = "${data.aws_ecr_repository.get_rounds.repository_url}:latest"
-  role          = aws_iam_role.lambda_exec.arn
-  timeout       = 30
-  memory_size   = 512
+  function_name                  = "ohitsthatguy-api-get-rounds"
+  package_type                   = "Image"
+  image_uri                      = "${data.aws_ecr_repository.get_rounds.repository_url}:latest"
+  role                           = aws_iam_role.lambda_exec.arn
+  timeout                        = 30
+  memory_size                    = 512
+
 
     environment {
     variables = {

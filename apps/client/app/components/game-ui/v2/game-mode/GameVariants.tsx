@@ -26,8 +26,10 @@ export function ACTOR_TO_MOVIE({
 }) {
   const { tracker } = useAnalytics();
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
+  const answered = selectedTitle !== null;
 
   const onSelectOption = (title: string) => {
+    if (answered) return;
     sendAnalyticsEvent(tracker, "answer_selected", {
       action: "answer_selected",
       category: "engagement",
@@ -42,11 +44,10 @@ export function ACTOR_TO_MOVIE({
     onAnswer(isCorrect);
   };
 
-  const showCorrect = selectedTitle !== null;
-
   useEffect(() => {
     setSelectedTitle(null);
   }, [round]);
+
   return (
     <div>
       <div className="flex flex-col items-center space-y-4">
@@ -59,8 +60,7 @@ export function ACTOR_TO_MOVIE({
         <div className="grid grid-cols-1 gap-3 mt-4">
           {round.choices.map((choice, index) => {
             const isSelected = selectedTitle === choice.name;
-            // Show correct if selected, otherwise only show selected
-            const isCorrect = showCorrect && choice.id === round.correctId;
+            const isCorrect = answered && choice.id === round.correctId;
             return (
               <Option
                 key={index}
@@ -68,6 +68,7 @@ export function ACTOR_TO_MOVIE({
                 onSelect={() => onSelectOption(choice.name)}
                 isCorrect={isCorrect}
                 isSelected={isSelected}
+                disabled={answered}
               />
             );
           })}
@@ -86,8 +87,10 @@ export function MOVIE_TO_ACTOR({
 }) {
   const { tracker } = useAnalytics();
   const [selectedActor, setSelectedActor] = useState<string | null>(null);
+  const answered = selectedActor !== null;
 
   const onSelectOption = (name: string) => {
+    if (answered) return;
     sendAnalyticsEvent(tracker, "answer_selected", {
       action: "answer_selected",
       category: "engagement",
@@ -102,11 +105,10 @@ export function MOVIE_TO_ACTOR({
     onAnswer(isCorrect);
   };
 
-  const showCorrect = selectedActor !== null;
-
   useEffect(() => {
     setSelectedActor(null);
   }, [round]);
+
   return (
     <div>
       <div className="flex flex-col items-center space-y-4 text-2xl text-white">
@@ -119,8 +121,7 @@ export function MOVIE_TO_ACTOR({
         <div className="grid grid-cols-1 gap-5 mt-4">
           {round.choices.map((choice, index) => {
             const isSelected = selectedActor === choice.name;
-            // Show correct if selected, otherwise only show selected
-            const isCorrect = showCorrect && choice.tmdb_id === round.correctId;
+            const isCorrect = answered && choice.tmdb_id === round.correctId;
             return (
               <ActorsOption
                 key={index}
@@ -129,6 +130,7 @@ export function MOVIE_TO_ACTOR({
                 onSelect={() => onSelectOption(choice.name)}
                 isCorrect={isCorrect}
                 isSelected={isSelected}
+                disabled={answered}
               />
             );
           })}
@@ -147,8 +149,10 @@ export function ACTOR_IN_MOVIE_TF({
 }) {
   const { tracker } = useAnalytics();
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const answered = selectedValue !== null;
 
   const onSelectOption = (value: string) => {
+    if (answered) return;
     sendAnalyticsEvent(tracker, "answer_selected", {
       action: "answer_selected",
       category: "engagement",
@@ -158,16 +162,14 @@ export function ACTOR_IN_MOVIE_TF({
       deviceuuid: localStorage.getItem("anonymous_device") || "unknown",
     });
     setSelectedValue(value);
-    const isCorrect =
-      round.correctAnswer === value.toUpperCase() ? true : false;
+    const isCorrect = round.correctAnswer === value.toUpperCase();
     onAnswer(isCorrect);
   };
-
-  const showCorrect = selectedValue !== null;
 
   useEffect(() => {
     setSelectedValue(null);
   }, [round]);
+
   return (
     <div>
       <div className="flex flex-col items-center space-y-4">
@@ -181,9 +183,7 @@ export function ACTOR_IN_MOVIE_TF({
       <div className="grid grid-cols-1 gap-3 mt-4">
         {["YES", "NO"].map((option, index) => {
           const isSelected = selectedValue === option.toUpperCase();
-          // Show correct if selected, otherwise only show selected
-          const isCorrect =
-            showCorrect && round.correctAnswer === option.toUpperCase();
+          const isCorrect = answered && round.correctAnswer === option.toUpperCase();
           return (
             <Option
               key={index}
@@ -191,6 +191,7 @@ export function ACTOR_IN_MOVIE_TF({
               onSelect={() => onSelectOption(option.toUpperCase())}
               isCorrect={isCorrect}
               isSelected={isSelected}
+              disabled={answered}
             />
           );
         })}

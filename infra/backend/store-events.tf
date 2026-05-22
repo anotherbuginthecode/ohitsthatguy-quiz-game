@@ -6,12 +6,13 @@ data "aws_ecr_repository" "store_events" {
 
 # Lambda in container
 resource "aws_lambda_function" "store_events" {
-  function_name = "ohitsthatguy-api-store-sessions"
-  package_type  = "Image"
-  image_uri     = "${data.aws_ecr_repository.store_events.repository_url}:latest"
-  role          = aws_iam_role.lambda_exec.arn
-  timeout       = 30
-  memory_size   = 512
+  function_name                  = "ohitsthatguy-api-store-sessions"
+  package_type                   = "Image"
+  image_uri                      = "${data.aws_ecr_repository.store_events.repository_url}:latest"
+  role                           = aws_iam_role.lambda_exec.arn
+  timeout                        = 30
+  memory_size                    = 512
+
 
     environment {
     variables = {
