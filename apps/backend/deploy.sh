@@ -31,6 +31,10 @@ echo "Docker image deployed to ECR: $ECR_REPO:$IMAGE_TAG"
 
 # Update the Lambda function to use the new image
 LAMBDA_FUNCTION_NAME="ohitsthatguy-api-$ECR_REPO_NAME"
+# store-events was provisioned under its former name (see infra/backend/store-events.tf)
+if [ "$ECR_REPO_NAME" = "store-events" ]; then
+  LAMBDA_FUNCTION_NAME="ohitsthatguy-api-store-sessions"
+fi
 echo "Updating Lambda function: $LAMBDA_FUNCTION_NAME..."
 aws lambda update-function-code \
   --function-name "$LAMBDA_FUNCTION_NAME" \

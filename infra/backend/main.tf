@@ -54,6 +54,8 @@ resource "aws_apigatewayv2_api" "api" {
       "POST",
     ]
     allow_origins     = [
+      "https://ohitsthatguy.com",
+      "https://www.ohitsthatguy.com",
       "https://ohitsthatguy.xyz",
       "https://www.ohitsthatguy.xyz",
       "http://localhost:5173",

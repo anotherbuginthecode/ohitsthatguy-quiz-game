@@ -53,8 +53,10 @@ These are injected as Lambda environment variables at apply time.
 
 - **S3 bucket** — hosts the built SPA static assets (`build/client/`)
 - **CloudFront distribution** — CDN with HTTPS, origin pointing to S3
-- **ACM certificate** — must be provisioned in `us-east-1` (CloudFront requirement), even though other resources are in `eu-west-1`
-- **Route53** — DNS records for `ohitsthatguy.xyz`
+- **ACM certificate** — must be provisioned in `us-east-1` (CloudFront requirement), even though other resources are in `eu-west-1`. Covers `ohitsthatguy.com` and `www.ohitsthatguy.com`, DNS-validated in Route53
+- **Route53** — hosted zone `ohitsthatguy.com`, managed here with `prevent_destroy`. The registrar is Namecheap, set to Custom DNS with the nameservers from the `com_name_servers` output. A/AAAA alias records point every host to CloudFront
+- **Canonical redirect** — CloudFront Function on the default behavior 301-redirects every non-apex host (e.g. `www`) to `https://ohitsthatguy.com`
+- The S3 bucket keeps its legacy name `ohitsthatguy.xyz` (the `.xyz` domain is no longer in use; renaming the bucket would mean recreating it)
 
 ## Adding a New Lambda
 

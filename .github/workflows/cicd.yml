@@ -30,7 +30,7 @@ jobs:
       - name: Create .env file
         run: echo "VITE_APP_GA4_MEASUREMENT_ID=${{ secrets.VITE_APP_GA4_MEASUREMENT_ID }}" > apps/client/.env
       - name: Add API URL to .env file
-        run: echo "VITE_APP_API_URL=https://ohitsthatguy.xyz" >>  apps/client/.env
+        run: echo "VITE_APP_API_URL=https://ohitsthatguy.com" >>  apps/client/.env
       - name: Add NODE_ENV to .env file
         run: echo "NODE_ENV=production" >>  apps/client/.env
 

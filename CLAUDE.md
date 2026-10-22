@@ -90,4 +90,6 @@ GET  /api/gameset  → get-gameset Lambda
 POST /api/events   → store-events Lambda
 ```
 
-CORS is configured for `localhost:5173` and `ohitsthatguy.xyz`.
+CORS is configured for `localhost:5173` and `ohitsthatguy.com` (`www.ohitsthatguy.com` is 301-redirected to the apex by CloudFront).
+
+The browser calls the API same-origin: CloudFront routes `/api/*` to API Gateway, so there is no separate API domain.

@@ -11,6 +11,15 @@ terraform {
 locals {
   # Strip "https://" and trailing slash to get the bare hostname for CloudFront origin
   api_gateway_domain = trimsuffix(trimprefix(var.api_gateway_endpoint, "https://"), "/")
+
+  # Canonical domain; every other alias is 301-redirected here by the CloudFront Function
+  primary_domain = "ohitsthatguy.com"
+
+  # host => Route53 zone id (each host gets A/AAAA alias records to CloudFront)
+  site_hosts = {
+    "ohitsthatguy.com"     = aws_route53_zone.com.zone_id
+    "www.ohitsthatguy.com" = aws_route53_zone.com.zone_id
+  }
 }
 
 provider "aws" {
@@ -46,15 +55,48 @@ resource "aws_s3_bucket_policy" "static_site_oac" {
 	})
 }
 
-data "aws_acm_certificate" "cert" {
-	domain   = "ohitsthatguy.xyz"
-	statuses = ["ISSUED"]
-	most_recent = true
+# Domain registered on Namecheap: its nameservers must point to this zone (see output "com_name_servers")
+resource "aws_route53_zone" "com" {
+	name = "ohitsthatguy.com"
+
+	lifecycle {
+		prevent_destroy = true
+	}
 }
 
-data "aws_route53_zone" "primary" {
-	name         = "ohitsthatguy.xyz."
-	private_zone = false
+output "com_name_servers" {
+	value       = aws_route53_zone.com.name_servers
+	description = "Nameservers to set on Namecheap (Domain > Nameservers > Custom DNS)"
+}
+
+# Single certificate for every CloudFront alias (a distribution accepts only one)
+resource "aws_acm_certificate" "site" {
+	domain_name               = local.primary_domain
+	subject_alternative_names = [for h in keys(local.site_hosts) : h if h != local.primary_domain]
+	validation_method         = "DNS"
+
+	lifecycle {
+		create_before_destroy = true
+	}
+}
+
+resource "aws_route53_record" "cert_validation" {
+	for_each = {
+		for dvo in aws_acm_certificate.site.domain_validation_options : dvo.domain_name => dvo
+	}
+
+	zone_id         = local.site_hosts[each.key]
+	name            = each.value.resource_record_name
+	type            = each.value.resource_record_type
+	records         = [each.value.resource_record_value]
+	ttl             = 300
+	# ACM reuses the same validation CNAME per domain, so the record may already exist
+	allow_overwrite = true
+}
+
+resource "aws_acm_certificate_validation" "site" {
+	certificate_arn         = aws_acm_certificate.site.arn
+	validation_record_fqdns = [for r in aws_route53_record.cert_validation : r.fqdn]
 }
 
 resource "aws_s3_bucket" "static_site" {
@@ -83,6 +125,30 @@ resource "aws_cloudfront_function" "api_key_injector" {
   code    = "function handler(event){var req=event.request;req.headers['x-api-key']={value:'${var.api_key}'};return req;}"
 }
 
+# 301-redirects www (and any other alias) to the canonical domain, preserving path and query string
+resource "aws_cloudfront_function" "canonical_redirect" {
+  name    = "ohitsthatguy-canonical-redirect"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  code    = <<-EOT
+    function handler(event) {
+      var req = event.request;
+      var host = req.headers.host ? req.headers.host.value : '';
+      if (host === '${local.primary_domain}') return req;
+      var qs = Object.keys(req.querystring).map(function (k) {
+        var p = req.querystring[k];
+        var values = p.multiValue ? p.multiValue.map(function (v) { return v.value; }) : [p.value];
+        return values.map(function (v) { return v === '' ? k : k + '=' + v; }).join('&');
+      }).join('&');
+      return {
+        statusCode: 301,
+        statusDescription: 'Moved Permanently',
+        headers: { location: { value: 'https://${local.primary_domain}' + req.uri + (qs ? '?' + qs : '') } }
+      };
+    }
+  EOT
+}
+
 resource "aws_cloudfront_origin_request_policy" "api" {
   name = "ohitsthatguy-api-origin-request-policy"
 
@@ -107,7 +173,7 @@ resource "aws_cloudfront_origin_access_control" "oac" {
 resource "aws_cloudfront_distribution" "cdn" {
 	enabled             = true
 	is_ipv6_enabled     = true
-	comment             = "CDN for ohitsthatguy.xyz static site"
+	comment             = "CDN for ohitsthatguy.com static site"
 	default_root_object = "index.html"
 
 				origin {
@@ -163,12 +229,17 @@ resource "aws_cloudfront_distribution" "cdn" {
 				forward = "none"
 			}
 		}
+
+		function_association {
+			event_type   = "viewer-request"
+			function_arn = aws_cloudfront_function.canonical_redirect.arn
+		}
 	}
 
 	price_class = "PriceClass_100"
 
 	viewer_certificate {
-		acm_certificate_arn            = data.aws_acm_certificate.cert.arn
+		acm_certificate_arn            = aws_acm_certificate_validation.site.certificate_arn
 		ssl_support_method             = "sni-only"
 		minimum_protocol_version       = "TLSv1.2_2021"
 	}
@@ -179,13 +250,28 @@ resource "aws_cloudfront_distribution" "cdn" {
 		}
 	}
 
-	aliases = ["ohitsthatguy.xyz"]
+	aliases = keys(local.site_hosts)
 }
 
-resource "aws_route53_record" "site" {
-	zone_id = data.aws_route53_zone.primary.zone_id
-	name    = "ohitsthatguy.xyz"
+resource "aws_route53_record" "site_a" {
+	for_each = local.site_hosts
+
+	zone_id = each.value
+	name    = each.key
 	type    = "A"
+	alias {
+		name                   = aws_cloudfront_distribution.cdn.domain_name
+		zone_id                = aws_cloudfront_distribution.cdn.hosted_zone_id
+		evaluate_target_health = false
+	}
+}
+
+resource "aws_route53_record" "site_aaaa" {
+	for_each = local.site_hosts
+
+	zone_id = each.value
+	name    = each.key
+	type    = "AAAA"
 	alias {
 		name                   = aws_cloudfront_distribution.cdn.domain_name
 		zone_id                = aws_cloudfront_distribution.cdn.hosted_zone_id

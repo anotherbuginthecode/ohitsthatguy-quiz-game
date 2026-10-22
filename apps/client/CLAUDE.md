@@ -51,7 +51,7 @@ Two parallel tracking mechanisms:
 Set at build time (injected by CI/CD):
 ```
 VITE_APP_GA4_MEASUREMENT_ID   # GA4 property ID
-VITE_APP_API_URL              # e.g. https://api.ohitsthatguy.xyz
+VITE_APP_API_URL              # e.g. https://ohitsthatguy.com
 ```
 
 For local dev, create `apps/client/.env` with these values.
