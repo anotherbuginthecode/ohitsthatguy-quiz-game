@@ -20,6 +20,22 @@ import ClassicModePlaying from "./game-mode/ClassicMode";
 
 export type GamePhase = "playing" | "roundEnd" | "gameEnd";
 
+// Actor shown in the end-of-game recap; MOVIE_TO_ACTOR has no featured actor, so use the correct answer
+function recapActor(round: Round | ClassicRound) {
+  if (!("type" in round)) return round.actor;
+  switch (round.type) {
+    case "MOVIE_TO_ACTOR":
+      return (
+        round.choices.find((c) => c.tmdb_id === round.correctId) ??
+        round.choices[0]
+      );
+    case "POPULARITY":
+      return round.left;
+    default:
+      return round.actor;
+  }
+}
+
 export default function GameUI({
   fetchedRounds,
   gameUUID,
@@ -53,18 +69,17 @@ export default function GameUI({
 
   const handleAnswer = (isCorrect: boolean) => {
     if (gameMode === null) return;
-    if (gameMode === "standard") {
-      setPickedAnswer([
-        ...pickedAnswer,
-        {
-          tmdb_id: currentActor.actor.tmdb_id,
-          name: currentActor.actor.name,
-          image: currentActor.actor.image,
-          correct: isCorrect,
-          mode: "standard",
-        },
-      ]);
-    }
+    const actor = recapActor(currentActor);
+    setPickedAnswer([
+      ...pickedAnswer,
+      {
+        tmdb_id: actor.tmdb_id,
+        name: actor.name,
+        image: actor.image,
+        correct: isCorrect,
+        mode: gameMode,
+      },
+    ]);
 
     if (isCorrect) {
       const { points, streak } = calculatePoints(

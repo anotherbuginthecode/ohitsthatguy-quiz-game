@@ -3,5 +3,5 @@ export type PickedAnswer = {
   name: string;
   image: string;
   correct: boolean;
-  mode: "standard" | "express";
+  mode: "standard" | "classic";
 };

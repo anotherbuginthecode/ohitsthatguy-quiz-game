@@ -74,9 +74,10 @@ function ScoreTab({
         <div className="text-white">(prev. score: {lastScore})</div>
         <div>
           <div className="text-center text-white mb-2">Your Rounds</div>
-          <div className="flex gap-3">
-            {pickedAnswer.map((actor) => (
-              <div className="relative" key={actor.tmdb_id}>
+          <div className="flex flex-wrap justify-center gap-3">
+            {pickedAnswer.map((actor, index) => (
+              // The same actor can appear in more than one round, so tmdb_id is not unique
+              <div className="relative" key={index}>
                 <Avatar className="w-10 h-10">
                   <AvatarImage
                     src={`https://image.tmdb.org/t/p/w500${actor.image}`}
